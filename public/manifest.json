@@ -1,0 +1,23 @@
+{
+  "name": "หมุดหมาย (Mudmy) - ตลาดชุมชนบนแผนที่",
+  "short_name": "Mudmy",
+  "description": "แพลตฟอร์มตลาดชุมชนบนแผนที่สำหรับค้นหาสินค้า บริการ ร้านค้า งาน และโอกาสใกล้บ้าน",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF7E36",
+  "icons": [
+    {
+      "src": "/apple-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

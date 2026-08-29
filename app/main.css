@@ -1,0 +1,964 @@
+/* Mudmy Global Styles - Fresh Start */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Mudmy Premium Brand Colors - New Logo Orange Theme */
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.12 0.01 250);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0.01 250);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.12 0.01 250);
+  
+  /* Primary: Vibrant Orange (#FF7E36) – matched with new logo */
+  --primary: oklch(0.72 0.21 45);
+  --primary-foreground: oklch(1 0 0);
+  
+  /* Secondary: Deep Orange/Red (#F43F5E) for premium gradients */
+  --secondary: oklch(0.65 0.22 35);
+  --secondary-foreground: oklch(1 0 0);
+  
+  --muted: oklch(0.97 0.005 250);
+  --muted-foreground: oklch(0.45 0.02 250);
+  
+  /* Accent: Warm Champagne for highlights */
+  --accent: oklch(0.96 0.03 70);
+  --accent-foreground: oklch(0.22 0.03 45);
+  
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+  
+  --border: oklch(0.92 0.005 250);
+  --input: oklch(0.92 0.005 250);
+  --ring: oklch(0.72 0.21 45);
+  
+  --radius: 1.25rem;
+  
+  /* Custom premium tokens */
+  --royal-blue: #FF7E36; /* new primary orange */
+  --royal-gold: #FFAD7E; /* soft orange */
+  --champagne: #FFF5F0;
+  --midnight: #1A1A1A;
+}
+
+.dark {
+  --background: oklch(0.12 0.015 250);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.17 0.015 250);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.17 0.015 250);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.68 0.21 45);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.60 0.22 35);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.22 0.015 250);
+  --muted-foreground: oklch(0.65 0.02 250);
+  --accent: oklch(0.25 0.05 45);
+  --accent-foreground: oklch(0.97 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.97 0 0);
+  --border: oklch(0.25 0.015 250);
+  --input: oklch(0.25 0.015 250);
+  --ring: oklch(0.68 0.21 45);
+  --chart-1: oklch(0.68 0.21 45);
+  --chart-2: oklch(0.60 0.22 35);
+  --chart-3: oklch(0.88 0.06 85);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.17 0.015 250);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.68 0.21 45);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.22 0.015 250);
+  --sidebar-accent-foreground: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.25 0.015 250);
+  --sidebar-ring: oklch(0.68 0.21 45);
+}
+
+@theme inline {
+  --font-sans: var(--font-kanit), 'Kanit', sans-serif;
+  --font-serif: var(--font-prompt), 'Prompt', sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Mudmy app polish */
+.mudmy-app-shell {
+  background:
+    radial-gradient(circle at 50% -5%, color-mix(in srgb, var(--primary), transparent 90%) 0, transparent 40rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--background), var(--accent) 12%) 0%, var(--background) 50%);
+}
+
+.dark .mudmy-app-shell {
+  background:
+    radial-gradient(circle at 50% -5%, color-mix(in srgb, var(--primary), transparent 85%) 0, transparent 40rem),
+    linear-gradient(180deg, #171717 0%, var(--background) 52%);
+}
+
+.mudmy-home-header {
+  background: linear-gradient(180deg, var(--background) 0%, color-mix(in srgb, var(--background), transparent 15%) 85%, transparent 100%);
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+}
+
+/* Premium Bottom Nav */
+.mudmy-bottom-nav {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--background), transparent 5%) 0%, var(--background) 100%);
+}
+
+.mudmy-hero-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -28px 52px rgba(0, 0, 0, 0.08);
+}
+
+.mudmy-pin-card {
+  scroll-snap-align: start;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.mudmy-pin-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--primary), transparent 58%);
+  box-shadow: 0 18px 32px -24px color-mix(in srgb, var(--primary), black 20%);
+}
+
+.mudmy-scroll-snap {
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 0.25rem;
+}
+
+.mudmy-section-title h2 {
+  letter-spacing: 0;
+}
+
+.mudmy-bottom-nav {
+  min-height: 4rem;
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scale-in {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.5); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 0.5s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Glass morphism utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Fancy Button Styles */
+.fancy-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  box-shadow: 
+    0 4px 0 0 oklch(0.5 0.15 45), /* 3D Depth Bottom */
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4), /* Inner Highlight Top */
+    0 10px 20px -5px rgba(255, 126, 54, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fancy-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 7px 0 0 oklch(0.5 0.15 45),
+    0 20px 30px -10px rgba(255, 126, 54, 0.6);
+  filter: brightness(1.1);
+}
+
+.fancy-button:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 
+    0 2px 0 0 oklch(0.5 0.15 45),
+    0 5px 10px -2px rgba(255, 126, 54, 0.4);
+}
+
+.fancy-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: 0.7s;
+}
+
+.fancy-button:hover::before {
+  left: 150%;
+}
+
+.fancy-button-shimmer-auto::before {
+  animation: shimmer-infinite 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes shimmer-infinite {
+  0% { left: -150%; }
+  30%, 100% { left: 150%; }
+}
+
+.fancy-button-glow {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 126, 54, 0.3), 0 4px 0 0 oklch(0.5 0.15 45); }
+  50% { box-shadow: 0 0 35px rgba(255, 126, 54, 0.6), 0 4px 0 0 oklch(0.5 0.15 45); }
+}
+
+.fancy-button-float {
+  animation: button-float 3s ease-in-out infinite;
+}
+
+@keyframes button-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.premium-border {
+  border: 1px solid transparent;
+  background-image: linear-gradient(var(--card), var(--card)), 
+                    linear-gradient(135deg, var(--royal-gold), var(--primary), var(--secondary));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* Premium 3D Pin Style (v2 - High Detail) */
+.premium-pin-3d-container {
+  position: relative;
+  width: 48px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
+}
+
+.premium-pin-3d-body {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  /* Semi-transparent radial gradient for a glowing glass look */
+  background: radial-gradient(circle at 35% 35%, 
+    color-mix(in srgb, var(--marker-color, #3B82F6), transparent 15%) 0%, 
+    color-mix(in srgb, var(--marker-color, #3B82F6), black 10%) 100%);
+  backdrop-filter: blur(3px);
+  border-radius: 50% 50% 50% 0;
+
+/* Mobile-First Improvements */
+@media (max-width: 639px) {
+  /* Smaller, more compact cards */
+  .mudmy-pin-card {
+    border-radius: 1.25rem !important;
+  }
+  
+  /* Compact article styling */
+  .mobile-compact article {
+    border-radius: 1.25rem !important;
+  }
+  
+  /* Touch-friendly tap targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better spacing for mobile */
+  .mobile-compact article .p-3 {
+    padding: 0.625rem !important;
+  }
+  
+  /* Improve scroll snap */
+  .mudmy-scroll-snap {
+    scroll-snap-type: x mandatory;
+    scroll-padding: 1rem;
+  }
+  
+  .mudmy-scroll-snap > * {
+    scroll-snap-align: start;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .mudmy-app-shell {
+    max-width: 100%;
+  }
+}
+
+/* Smooth scrolling for better UX */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Improve touch scrolling */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Better focus states for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+  transform: rotate(-45deg);
+  box-shadow: 
+    -2px 2px 12px rgba(0,0,0,0.3),
+    inset -2px 2px 6px rgba(0,0,0,0.2),
+    inset 4px -4px 10px rgba(255,255,255,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  border: 1.5px solid rgba(255,255,255,0.4);
+}
+
+/* Aura removed as requested, replaced with subtle pulse-bounce */
+@keyframes marker-soft-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
+}
+
+/* Fancy Premium Button Style - Removed old redundant styles */
+
+/* Golden/Beige Ring */
+.premium-pin-3d-ring {
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle at 30% 30%, #E9C46A 0%, #D4A373 100%);
+  border-radius: 50%;
+  transform: rotate(45deg); /* Correct back the rotation */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 2px 5px rgba(0,0,0,0.3),
+    inset -1px 1px 3px rgba(0,0,0,0.2),
+    inset 1px -1px 3px rgba(255,255,255,0.5);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* White Center */
+.premium-pin-3d-inner {
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at 30% 30%, #FFFFFF 0%, #F1F5F9 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    inset 0 1px 3px rgba(0,0,0,0.1),
+    0 1px 2px rgba(255,255,255,0.8);
+}
+
+.premium-pin-3d-icon {
+  color: var(--marker-color, #3B82F6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
+  transform: scale(0.85);
+}
+
+.premium-pin-3d-shadow {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 6px;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, transparent 80%);
+  filter: blur(2px);
+  z-index: 1;
+}
+
+/* Glossy highlights */
+.premium-pin-3d-body::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 30%;
+  height: 30%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, transparent 100%);
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+/* Mobile-Compact PinCard for 2-column grid */
+@media (max-width: 639px) {
+  .mobile-compact article {
+    border-radius: 1.5rem !important;
+  }
+  /* Square image */
+  .mobile-compact .aspect-\[4\/3\] {
+    aspect-ratio: 1 / 1 !important;
+  }
+  /* Hide specific overlay elements on mobile to keep it clean */
+  .mobile-compact .absolute.top-4.left-4.right-4 > .bg-black\/40 {
+    display: none !important; /* Hide category badge on image if not featured */
+  }
+  /* Scale down like button on mobile compact */
+  .mobile-compact article button.w-10.h-10 {
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+    border-radius: 0.6rem !important;
+  }
+  .mobile-compact article button.w-10.h-10 svg {
+    width: 0.8rem !important;
+    height: 0.8rem !important;
+  }
+  /* Distance badge smaller */
+  .mobile-compact article .absolute.bottom-4.left-4 div {
+    padding: 0.15rem 0.4rem !important;
+    border-radius: 0.6rem !important;
+  }
+  .mobile-compact article .absolute.bottom-4.left-4 span {
+    font-size: 0.55rem !important;
+  }
+  /* Expiration badge smaller */
+  .mobile-compact article .absolute.bottom-4.right-4 span {
+    padding: 0.15rem 0.4rem !important;
+    font-size: 0.55rem !important;
+  }
+  /* Card content padding */
+  .mobile-compact article > div:last-child {
+    padding: 0.75rem !important;
+  }
+  /* Price & Rating row */
+  .mobile-compact article div.flex.items-center.justify-between.mb-3 {
+    margin-bottom: 0.4rem !important;
+  }
+  .mobile-compact article div.px-3.py-1.rounded-xl {
+    padding: 0.15rem 0.5rem !important;
+    border-radius: 0.6rem !important;
+  }
+  .mobile-compact article span.italic {
+    font-size: 0.75rem !important;
+  }
+  /* Title */
+  .mobile-compact article h3 {
+    font-size: 0.85rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.4rem !important;
+    -webkit-line-clamp: 2 !important;
+  }
+  /* Footer divider & row */
+  .mobile-compact article .border-t {
+    margin-top: 0.5rem !important;
+    padding-top: 0.5rem !important;
+  }
+  /* Avatar smaller */
+  .mobile-compact article .w-8 {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+  }
+  .mobile-compact article .w-8 span {
+    font-size: 0.45rem !important;
+  }
+  /* Owner Name & District */
+  .mobile-compact article .flex-col span:first-child {
+    font-size: 0.65rem !important;
+    max-width: 60px !important;
+  }
+  .mobile-compact article .flex-col span:last-child {
+    font-size: 0.55rem !important;
+  }
+  /* Time Left badge */
+  .mobile-compact article div.bg-muted\/50 {
+    padding: 0.15rem 0.4rem !important;
+    font-size: 0.6rem !important;
+  }
+  /* Disable hover lift on mobile */
+  .mobile-compact article {
+    transform: none !important;
+  }
+}
+
+/* Premium Map Global Styles */
+.leaflet-container {
+  background: #f0f4f8 !important;
+  outline: none;
+  font-family: inherit;
+}
+
+/* Subtle & Crisp Tile Enhancement */
+.leaflet-tile-pane {
+  filter: saturate(1.08) contrast(1.03) brightness(1.01);
+  transition: filter 0.4s ease;
+}
+
+.dark .leaflet-tile-pane {
+  filter: brightness(1.2) contrast(1.1) saturate(1.2);
+}
+
+/* Glassmorphism Popups */
+.custom-popup .leaflet-popup-content-wrapper,
+.leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 26px !important;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.22), 0 0 1px rgba(0, 0, 0, 0.1) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.dark .custom-popup .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-content-wrapper {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.6) !important;
+}
+
+.leaflet-popup-tip-container {
+  margin-top: -1px !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+.dark .leaflet-popup-tip {
+  background: rgba(15, 23, 42, 0.9) !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  padding: 12px !important;
+  line-height: 1.4 !important;
+}
+
+.custom-popup .leaflet-popup-close-button {
+  top: 10px !important;
+  right: 10px !important;
+  width: 28px !important;
+  height: 28px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+  color: #1e293b !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1px solid rgba(0,0,0,0.05) !important;
+  padding: 0 !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  z-index: 20 !important;
+}
+
+.custom-popup .leaflet-popup-close-button:hover {
+  background: #ffffff !important;
+  color: var(--primary) !important;
+  transform: rotate(90deg) scale(1.1) !important;
+}
+
+/* ──────────────────────────────────────────────────────────
+   3D Teardrop Pin Marker with Ground Radar Rings (As in Image)
+   ────────────────────────────────────────────────────────── */
+.pin-3d-marker {
+  position: relative;
+  width: 48px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transform-origin: 24px 58px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pin-3d-marker:hover {
+  transform: scale(1.12) translateY(-4px);
+  z-index: 1000 !important;
+}
+
+.pin-3d-marker.marker-selected {
+  transform: scale(1.22) translateY(-8px);
+  z-index: 2000 !important;
+}
+
+/* Ground Radar Ripples underneath the pin tip */
+.pin-ground-ripples {
+  position: absolute;
+  left: 24px;
+  top: 58px;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.ground-shadow {
+  position: absolute;
+  left: -14px;
+  top: -6px;
+  width: 28px;
+  height: 12px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 75%);
+  border-radius: 50%;
+  transform: rotateX(60deg);
+  z-index: 0;
+}
+
+.ground-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid var(--pin-color);
+  background: radial-gradient(ellipse at center, rgba(var(--pin-rgb), 0.18) 0%, rgba(var(--pin-rgb), 0) 70%);
+  transform: translate(-50%, -50%) rotateX(60deg);
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.ground-ring-1 {
+  width: 28px;
+  height: 28px;
+  opacity: 0.85;
+}
+
+.ground-ring-2 {
+  width: 44px;
+  height: 44px;
+  opacity: 0.55;
+  animation: radar-pulse-1 2.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+.ground-ring-3 {
+  width: 60px;
+  height: 60px;
+  opacity: 0.3;
+  animation: radar-pulse-2 2.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+@keyframes radar-pulse-1 {
+  0% { transform: translate(-50%, -50%) rotateX(60deg) scale(0.85); opacity: 0.7; }
+  50% { transform: translate(-50%, -50%) rotateX(60deg) scale(1.05); opacity: 0.45; }
+  100% { transform: translate(-50%, -50%) rotateX(60deg) scale(0.85); opacity: 0.7; }
+}
+
+@keyframes radar-pulse-2 {
+  0% { transform: translate(-50%, -50%) rotateX(60deg) scale(0.9); opacity: 0.4; }
+  50% { transform: translate(-50%, -50%) rotateX(60deg) scale(1.15); opacity: 0.15; }
+  100% { transform: translate(-50%, -50%) rotateX(60deg) scale(0.9); opacity: 0.4; }
+}
+
+/* 3D Pin Head & Body */
+.pin-3d-head {
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 44px;
+  height: 56px;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.22));
+  z-index: 2;
+  transition: filter 0.3s ease;
+}
+
+.pin-3d-svg {
+  width: 44px;
+  height: 56px;
+  display: block;
+}
+
+/* Icon Disc inside Teardrop */
+.pin-3d-icon-badge {
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  z-index: 3;
+  color: var(--pin-color);
+  transition: transform 0.2s ease;
+}
+
+.pin-3d-icon-badge svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.3;
+}
+
+/* Marker Cluster Styles */
+.custom-marker-cluster {
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 122, 0, 0.22);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 122, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.cluster-inner {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #ff8a00 0%, #e55300 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(229, 83, 0, 0.45);
+  border: 2px solid white;
+}
+
+.marker-cluster-custom {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Premium Attribution Style */
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(4px) !important;
+  border-radius: 8px 0 0 0 !important;
+  font-size: 8px !important;
+  color: var(--muted-foreground) !important;
+  padding: 0 6px !important;
+  border: none !important;
+  opacity: 0.6;
+}
+
+.dark .leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* User location refined pulse */
+@keyframes user-location-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); transform: scale(0.9); opacity: 1; }
+  70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); transform: scale(1.5); opacity: 0; }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); transform: scale(0.9); opacity: 0; }
+}
+
+.user-location-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Make wrapper not capture clicks by default */
+}
+
+.user-location-dot {
+  width: 18px;
+  height: 18px;
+  background: #3B82F6;
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6), 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 2;
+  pointer-events: auto; /* Only dot is clickable */
+  cursor: pointer;
+}
+
+.user-location-pulse {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 50%;
+  animation: user-location-pulse 2s infinite ease-out;
+  z-index: 1;
+  pointer-events: none; /* Pulse should never block clicks */
+}
+
+.map-3d-perspective .leaflet-container {
+  transform: perspective(1600px) rotateX(12deg) scale(1.02) !important;
+  transform-origin: 50% 50%;
+  transition: transform 0.45s ease;
+}
+
+/* Wrapper needs to clip overflow from the tilt */
+.map-3d-perspective {
+  overflow: hidden;
+}
+
+/* ===================== DARK MAP MODE ===================== */
+/* Boost brightness so road labels are readable on dark tiles */
+.map-dark-mode .leaflet-container {
+  filter: none !important;
+}
+
+.map-dark-mode .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.78) contrast(1.12) saturate(0.72) !important;
+}
+
+.leaflet-container .leaflet-tile-pane img.leaflet-tile {
+  mix-blend-mode: normal !important;
+}
+
+.leaflet-container .leaflet-tile-pane {
+  filter: saturate(1.08) contrast(1.03) brightness(1.01) !important;
+}
+
+.map-dark-mode .leaflet-container .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.78) contrast(1.12) saturate(0.72) !important;
+}
+
+.map-positron-mode .leaflet-container .leaflet-tile-pane,
+.map-positron-tiles {
+  filter: grayscale(1) brightness(1.08) contrast(0.92) saturate(0.15) !important;
+}
+
+.map-3d-perspective .leaflet-container .leaflet-tile-pane {
+  filter: saturate(1.12) contrast(1.06) brightness(0.98) drop-shadow(0 8px 12px rgba(15, 23, 42, 0.12)) !important;
+}
+
