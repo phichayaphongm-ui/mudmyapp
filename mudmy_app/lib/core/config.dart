@@ -10,13 +10,12 @@ class AppConfig {
 
   static const String supabaseUrl = String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://hbpatulzbnzosgklrozv.supabase.co',
+    defaultValue: 'https://YOUR_PROJECT_REF.supabase.co',
   );
 
   static const String supabaseAnonKey = String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhicGF0dWx6Ym56b3Nna2xyb3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4NjI5MzUsImV4cCI6MjA5OTQzODkzNX0.gPpsMqXlpX3Cu-4WOGfcrwPSLiyZXQYmxhQHDLeflJc',
+    defaultValue: 'YOUR_SUPABASE_ANON_KEY',
   );
 
   static const String storageBucket = 'mudmy';

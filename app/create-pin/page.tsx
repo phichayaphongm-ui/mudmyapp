@@ -7,7 +7,7 @@ import {
   ArrowLeft, Upload, X, CheckCircle2, Loader2, Heart, Clock,
   ShoppingBag, Wrench, Briefcase, Car,
   Home, AlertTriangle,
-  Store, Fuel, Calendar, Newspaper
+  Store, Fuel, Calendar, Newspaper, Building2, PawPrint
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -35,7 +35,9 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Fuel,
   Calendar,
   Newspaper,
-  AlertTriangle
+  AlertTriangle,
+  Building2,
+  PawPrint
 }
 
 const LocationPicker = dynamic(() => import('@/components/map/LocationPicker'), {
@@ -103,6 +105,8 @@ function CreatePinContent() {
   const [paymentLoading, setPaymentLoading] = useState(false)
   const [paymentDone, setPaymentDone] = useState(false)
   const [createdPinId, setCreatedPinId] = useState<string | null>(null)
+  const [paymentSource, setPaymentSource] = useState<any>(null)
+  const [paymentError, setPaymentError] = useState<string | null>(null)
  
   if (banStatus.banned) {
     return (
@@ -170,14 +174,13 @@ function CreatePinContent() {
     }
 
     setPaymentLoading(true)
+    setPaymentError(null)
     try {
-      // 1. Prepare Pin ID first for storage path
       const now = new Date();
       const expiresAt = new Date(now);
       expiresAt.setDate(expiresAt.getDate() + 30);
 
       const tempPinId = `pin_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-
       const imageUrls: string[] = [];
       for (const file of images) {
         const compressedFile = await compressImage(file);
@@ -185,7 +188,8 @@ function CreatePinContent() {
         imageUrls.push(url);
       }
 
-      // 3. Prep data
+      const isFree = category === 'emergency' || isFreePin;
+
       const pinData: Omit<Pin, 'id' | 'daysLeft'> = {
         title,
         category: category!,
@@ -205,7 +209,7 @@ function CreatePinContent() {
         ownerId: user.id,
         ownerName: user.nickname || user.name || 'User',
         ownerAvatar: user.avatar,
-        status: 'active',
+        status: isFree ? 'active' : 'pending_payment',
         plan: 'general',
         featured: category === 'emergency',
         views: 0,
@@ -219,59 +223,72 @@ function CreatePinContent() {
           : expiresAt.toISOString(),
         radius: radius > 0 ? radius : undefined,
         ownerType: user.userType || 'personal',
-        isFreePin: isFreePin, // Mark as free pin
+        isFreePin: isFree,
       };
-      
-      // Validate coordinates before creating pin
+
       const isValidLat = typeof lat === 'number' && lat >= -90 && lat <= 90;
       const isValidLng = typeof lng === 'number' && lng >= -180 && lng <= 180;
-      
       if (!isValidLat || !isValidLng) {
         alert('พิกัดไม่ถูกต้อง กรุณาเลือกตำแหน่งใหม่');
         return;
       }
-      
-      // 4. Create pin
+
       const pinId = await createPin(pinData);
       setCreatedPinId(pinId);
-      
-      // 5. Create payment and update user quota
-      if (pinId) {
-        try {
-          await incrementUserActivePins(user.id, 1);
-          
-          // Update user to mark free pin used if this was free
-          if (isFreePin) {
-            await updateUserProfile(user.id, {
-              hasUsedFreePin: true,
-              freePinId: pinId
-            });
-          }
-          
-          // Skip actual payment for emergency or free pin
-          const isFree = category === 'emergency' || isFreePin;
-          
-          await createPayment({
-            userId: user.id,
-            pinId: pinId,
-            amount: isFree ? 0 : 10,
-            status: 'paid', 
-            method: 'promptpay',
-            createdAt: now.toISOString(),
-            paidAt: now.toISOString(),
-          });
-          setPaymentDone(true);
-        } catch (error) {
-          console.error('Error in post-creation steps:', error);
-          // Even if post-creation steps fail, the pin was created successfully
-          setPaymentDone(true);
-        }
-      } else {
-        throw new Error('Failed to create pin - no ID returned');
+
+      if (isFree) {
+        await incrementUserActivePins(user.id, 1);
+        await updateUserProfile(user.id, {
+          hasUsedFreePin: true,
+          freePinId: pinId,
+        });
+        await createPayment({
+          userId: user.id,
+          pinId: pinId,
+          amount: 0,
+          status: 'paid',
+          method: 'promptpay',
+          createdAt: now.toISOString(),
+          paidAt: now.toISOString(),
+        });
+        setPaymentDone(true);
+        return;
       }
+
+      const paymentResponse = await fetch('/api/payments/charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: 10,
+          email: user.email,
+          description: `Mudmy pin listing - ${title || 'New pin'}`,
+          userId: user.id,
+          pinId,
+        }),
+      });
+
+      const paymentPayload = await paymentResponse.json();
+      if (!paymentResponse.ok) {
+        throw new Error(paymentPayload?.error || 'Unable to start Omise payment');
+      }
+
+      const source = paymentPayload.source || paymentPayload.data?.source;
+      setPaymentSource(source);
+      await createPayment({
+        userId: user.id,
+        pinId: pinId,
+        amount: 10,
+        status: 'pending',
+        method: 'promptpay',
+        createdAt: now.toISOString(),
+        promptpayRef: source?.id || paymentPayload?.reference || undefined,
+      });
+
+      setPaymentDone(true);
     } catch (e) {
       console.error(e);
-      alert(t('createPin.alerts.error'));
+      setPaymentError(e instanceof Error ? e.message : t('createPin.alerts.error'));
+      alert(e instanceof Error ? e.message : t('createPin.alerts.error'));
     } finally {
       setPaymentLoading(false);
     }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { Plus, Search, SlidersHorizontal, Loader2, MapPin } from 'lucide-react'
+import { Plus, Search, SlidersHorizontal, Loader2, MapPin, Home } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -418,13 +418,24 @@ function ExplorePageContent() {
       </Link>
 
       {/* Bottom Navigation Bar (As in Image) */}
-      <nav className={cn("z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-t border-slate-200/80 dark:border-slate-800/80 px-6 py-2 shadow-2xl shrink-0", selectedPin && "hidden")}>
-        <div className="max-w-md mx-auto flex items-center justify-around">
-          {/* Tab 1: แผนที่ */}
+      <nav className={cn("z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border-t border-slate-200/80 dark:border-slate-800/80 px-4 py-2 shadow-2xl shrink-0", selectedPin && "hidden")}>
+        <div className="max-w-md mx-auto flex items-center justify-around gap-1">
+          {/* Tab 1: Home */}
+          <Link
+            href="/home"
+            className="flex flex-col items-center gap-1 px-3 py-1 text-slate-400 hover:text-slate-600 transition-all"
+          >
+            <div className="relative flex items-center justify-center w-[22px] h-[22px]">
+              <Home className="w-[22px] h-[22px]" />
+            </div>
+            <span className="text-[11px]">Home</span>
+          </Link>
+
+          {/* Tab 2: แผนที่ */}
           <button
             onClick={() => setViewMode('map')}
             className={cn(
-              "flex flex-col items-center gap-1 px-4 py-1 transition-all",
+              "flex flex-col items-center gap-1 px-3 py-1 transition-all",
               viewMode === 'map' ? "text-primary font-bold" : "text-slate-400 hover:text-slate-600"
             )}
           >
@@ -437,11 +448,11 @@ function ExplorePageContent() {
             <span className="text-[11px]">แผนที่</span>
           </button>
 
-          {/* Tab 2: รายการ */}
+          {/* Tab 3: รายการ */}
           <button
             onClick={() => setViewMode('list')}
             className={cn(
-              "flex flex-col items-center gap-1 px-4 py-1 transition-all",
+              "flex flex-col items-center gap-1 px-3 py-1 transition-all",
               viewMode === 'list' ? "text-primary font-bold" : "text-slate-400 hover:text-slate-600"
             )}
           >
@@ -454,10 +465,10 @@ function ExplorePageContent() {
             <span className="text-[11px]">รายการ</span>
           </button>
 
-          {/* Tab 3: บัญชี */}
+          {/* Tab 4: บัญชี */}
           <Link
             href="/dashboard"
-            className="flex flex-col items-center gap-1 px-4 py-1 text-slate-400 hover:text-slate-600 transition-all"
+            className="flex flex-col items-center gap-1 px-3 py-1 text-slate-400 hover:text-slate-600 transition-all"
           >
             <div className="w-[22px] h-[22px] rounded-full overflow-hidden border border-slate-300 flex-shrink-0">
               {user?.avatar ? (

@@ -361,6 +361,8 @@ export default function HomePage() {
     { id: 'events', title: t('categories.events'), image: '/images/Bottom/8.Eventกิจกรรม.png', href: '/explore?category=events' },
     { id: 'news', title: t('categories.news'), image: '/images/Bottom/9.ข่าวสารในชุมชน.png', href: '/explore?category=news' },
     { id: 'emergency', title: t('categories.emergency'), image: '/images/Bottom/10.เหตุฉุกเฉิน.png', href: '/explore?category=emergency' },
+    { id: 'lodging', title: t('categories.lodging'), image: '/images/Bottom/11.ที่พัก.png', href: '/explore?category=lodging' },
+    { id: 'pets', title: t('categories.pets'), image: '/images/Bottom/12.สัตว์เลี้ยง.png', href: '/explore?category=pets' },
   ]
 
   if (authLoading) {
@@ -780,6 +782,69 @@ export default function HomePage() {
             </div>
           </div>
         )}
+
+        {/* Ad Banner Slot - for future advertisement sales */}
+        <div className="mt-6 px-0 md:px-0">
+          <div className="mb-2 flex items-center justify-between px-1">
+            <h2 className="text-sm font-black text-foreground">Promotion</h2>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {[
+              {
+                id: 'phichaya',
+                src: '/Banner/phichaya.jpg',
+                href: 'https://www.phichaya.com',
+                alt: 'Phichaya promotion banner',
+                ariaLabel: 'Visit Phichaya advertisement',
+              },
+              {
+                id: 'mudmy',
+                src: '/Banner/mudmy.jpg',
+                href: 'https://www.mudmy.app',
+                alt: 'Mudmy promotion banner',
+                ariaLabel: 'Visit Mudmy advertisement',
+              },
+              {
+                id: 'contact',
+                type: 'empty',
+                title: 'ติดต่อโฆษณา',
+                href: '#',
+              },
+            ].map((banner) => {
+              if (banner.type === 'empty') {
+                return (
+                  <div
+                    key={banner.id}
+                    className="flex h-[118px] items-center justify-center rounded-[1.25rem] border border-dashed border-slate-300 bg-slate-50/80 text-center text-sm font-bold text-slate-500 shadow-sm sm:h-[130px] md:h-[156px] md:rounded-[1.5rem]"
+                  >
+                    <span>{banner.title}</span>
+                  </div>
+                )
+              }
+
+              return (
+                <Link
+                  key={banner.id}
+                  href={banner.href || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={banner.ariaLabel}
+                  className="group block w-full"
+                >
+                  <div className="relative overflow-hidden rounded-[1.25rem] bg-white shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.99] md:rounded-[1.5rem]">
+                    <img
+                      src={banner.src}
+                      alt={banner.alt}
+                      className="block h-[118px] w-full border-0 bg-white object-contain object-center sm:h-[130px] md:h-[156px]"
+                      style={{ objectPosition: 'center center' }}
+                    />
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </div>
       </>
     )}
 

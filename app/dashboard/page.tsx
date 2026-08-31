@@ -25,11 +25,11 @@ import { CATEGORIES } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { getUserDailyAnalytics, type DailyAnalytics } from '@/lib/services/analytics'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import { ShoppingBag, Wrench, Briefcase, Building2, Car, Loader2 } from 'lucide-react'
+import { ShoppingBag, Wrench, Briefcase, Building2, Car, Loader2, PawPrint } from 'lucide-react'
 import { getSoundManager, playSound, setSoundVolume, SOUND_OPTIONS } from '@/lib/utils/sounds'
 
 const ICON_MAP: Record<string, React.ElementType> = {
-  ShoppingBag, Wrench, Briefcase, HeartHandshake, Building2, Car,
+  ShoppingBag, Wrench, Briefcase, HeartHandshake, Building2, Car, PawPrint,
 }
 
 const MAX_PINS = 5

@@ -3,7 +3,7 @@
 import { 
   ShoppingBag, Wrench, Briefcase, Car, Sparkles,
   Home, AlertTriangle,
-  Store, Fuel, Calendar, Newspaper, ChevronRight
+  Store, Fuel, Calendar, Newspaper, ChevronRight, PawPrint, Building2
 } from 'lucide-react'
 import { CATEGORIES, type PinCategory } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -19,7 +19,9 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Fuel,
   Calendar,
   Newspaper,
-  AlertTriangle
+  AlertTriangle,
+  Building2,
+  PawPrint
 }
 
 const CATEGORY_SUBTITLES: Record<string, string> = {
@@ -34,6 +36,23 @@ const CATEGORY_SUBTITLES: Record<string, string> = {
   events: 'เทศกาล & กิจกรรม',
   news: 'ข่าวในพื้นที่',
   emergency: 'แจ้งเหตุด่วน 24 ชม.',
+  lodging: 'ห้องพัก & ที่พัก',
+  pets: 'สัตว์เลี้ยง & อุปกรณ์',
+}
+
+const CATEGORY_ACCENTS: Record<PinCategory, string> = {
+  sell: '#FF7A00',
+  service: '#10B981',
+  marketplace: '#0EA5E9',
+  jobs: '#F59E0B',
+  taxi: '#EAB308',
+  property: '#4F46E5',
+  fuel_ev: '#0891B2',
+  events: '#9333EA',
+  news: '#475569',
+  emergency: '#DC2626',
+  lodging: '#A7D8FF',
+  pets: '#F9C7D8',
 }
 
 interface CategoryFilterProps {
@@ -79,7 +98,8 @@ export function CategoryFilter({ selected, onChange, className }: CategoryFilter
         const Icon = ICON_MAP[cat.icon] || ShoppingBag
         const isActive = selected === cat.id
         const subtitle = CATEGORY_SUBTITLES[cat.id] || t(`categories.${cat.id}`)
-        
+        const accentColor = CATEGORY_ACCENTS[cat.id] || '#3B82F6'
+
         return (
           <button
             key={cat.id}
@@ -91,10 +111,17 @@ export function CategoryFilter({ selected, onChange, className }: CategoryFilter
                 : 'bg-white/95 dark:bg-slate-900/95 text-slate-700 dark:text-slate-200 border-slate-200/80 dark:border-slate-800 hover:border-primary/40 hover:shadow-md'
             )}
           >
-            <div className={cn(
-              "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors",
-              isActive ? "bg-white/25 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 group-hover:text-primary"
-            )}>
+            <div
+              className={cn(
+                "w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors border",
+                isActive ? "border-white/40" : "border-transparent"
+              )}
+              style={{
+                backgroundColor: isActive ? accentColor : `${accentColor}1A`,
+                color: isActive ? '#ffffff' : accentColor,
+                boxShadow: isActive ? `0 0 0 4px ${accentColor}33` : 'none',
+              }}
+            >
               <Icon className="w-4 h-4" />
             </div>
             <div className="flex-1 min-w-0 pr-1">

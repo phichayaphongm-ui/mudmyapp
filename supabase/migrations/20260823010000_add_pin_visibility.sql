@@ -35,6 +35,7 @@ WHERE show_on_map IS NULL;
 -- WHERE id = 'PUT_PIN_ID_HERE';
 
 -- 4) ฟังก์ชันช่วยตรวจว่า “หมุดนี้ควรแสดงตอนนี้หรือไม่”
+DROP FUNCTION IF EXISTS public.is_pin_visible_now(uuid);
 CREATE OR REPLACE FUNCTION public.is_pin_visible_now(pin_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql STABLE

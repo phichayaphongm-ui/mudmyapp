@@ -68,6 +68,14 @@ const CATEGORY_ICONS: Record<string, { color: string, svg: string }> = {
     color: '#DC2626', 
     svg: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m12 5 7 7-7 7-7-7 7-7Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>' 
   },
+  lodging: {
+    color: '#A7D8FF',
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7.5A1.5 1.5 0 0 1 9.5 6h5A1.5 1.5 0 0 1 16 7.5V11"/><path d="M3 20h18"/><path d="M10 15h4"/><path d="M9 8h6"/><path d="M7 7.5h10"/><rect x="9" y="13" width="6" height="2" rx="1"/></svg>'
+  },
+  pets: {
+    color: '#F9C7D8',
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="6" r="2"/><circle cx="17" cy="6" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="5.5" cy="12" r="2"/><circle cx="18.5" cy="12" r="2"/><path d="M9 16c1.1 1.6 2.1 2.4 3 2.4s1.9-.8 3-2.4v-2H9v2Z"/><path d="M6 15.5v3"/><path d="M18 15.5v3"/></svg>'
+  },
 }
 
 const createCategoryIcon = (category?: string) => {

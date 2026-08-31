@@ -149,5 +149,6 @@ export function mapRowToUser(row: any): AppUser {
     showFacebook: row.show_facebook !== false,
     showPins: row.show_pins !== false,
     showHeroHistory: row.show_hero_history !== false,
+    isAdmin: Boolean(row.is_admin) || (typeof row.email === 'string' && row.email.toLowerCase() === 'mudmy.app@gmail.com'),
   };
 }

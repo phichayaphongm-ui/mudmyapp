@@ -9,6 +9,8 @@ export type PinCategory =
   | 'events'
   | 'news'
   | 'emergency'
+  | 'lodging'
+  | 'pets'
 
 export type PinStatus = 'active' | 'expired' | 'pending_payment' | 'resolved'
 
@@ -76,6 +78,7 @@ export interface User {
   showFacebook?: boolean
   showPins?: boolean
   showHeroHistory?: boolean
+  isAdmin?: boolean
 }
 
 export interface Pin {
@@ -197,4 +200,6 @@ export const CATEGORIES: CategoryInfo[] = [
   { id: 'events', label: 'Eventกิจกรรม', labelEn: 'Events', icon: 'Calendar', color: 'text-purple-600', bgColor: 'bg-purple-50 border-purple-200' },
   { id: 'news', label: 'ข่าวสารในชุมชน', labelEn: 'Community News', icon: 'Newspaper', color: 'text-slate-600', bgColor: 'bg-slate-50 border-slate-200' },
   { id: 'emergency', label: 'เหตุฉุกเฉิน', labelEn: 'Emergency', icon: 'AlertTriangle', color: 'text-red-600', bgColor: 'bg-red-50 border-red-300 animate-pulse' },
+  { id: 'lodging', label: 'ที่พัก', labelEn: 'Accommodation', icon: 'Building2', color: 'text-teal-600', bgColor: 'bg-teal-50 border-teal-200' },
+  { id: 'pets', label: 'สัตว์เลี้ยง', labelEn: 'Pets', icon: 'PawPrint', color: 'text-pink-600', bgColor: 'bg-pink-50 border-pink-200' },
 ]

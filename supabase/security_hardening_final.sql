@@ -149,6 +149,7 @@ alter table public.pin_events enable row level security;
 drop policy if exists "Anyone can read pin events" on public.pin_events;
 drop policy if exists "Authenticated users can insert pin events" on public.pin_events;
 drop policy if exists "Anyone can insert pin events" on public.pin_events;
+drop policy if exists "Anyone can insert anonymous analytics events" on public.pin_events;
 
 create policy "Anyone can read pin events"
 on public.pin_events for select
@@ -371,6 +372,28 @@ using (
   and auth.role() = 'authenticated'
 );
 
+create or replace function public.delete_expired_chat_images()
+returns bigint
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  deleted_count bigint;
+begin
+  delete from storage.objects
+  where bucket_id = 'mudmy'
+    and (storage.foldername(name))[1] = 'chats'
+    and created_at < now() - interval '7 days';
+
+  get diagnostics deleted_count = row_count;
+  return deleted_count;
+end;
+$$;
+
+revoke all on function public.delete_expired_chat_images() from public;
+grant execute on function public.delete_expired_chat_images() to service_role;
+
 create policy "Owners can upload pin images"
 on storage.objects for insert
 with check (
@@ -442,7 +465,86 @@ using (
 );
 
 -- ---------------------------------------------------------------------------
--- 8) SECURITY NOTE: do not expose service role to frontend
+-- 8) ADMIN ACCESS
+-- ---------------------------------------------------------------------------
+
+alter table public.users
+  add column if not exists is_admin boolean not null default false;
+
+update public.users
+set is_admin = true
+where lower(email) = 'mudmy.app@gmail.com';
+
+create or replace function public.is_admin_user(p_uid text)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.users u
+    where u.id = p_uid
+      and (
+        u.is_admin = true
+        or lower(u.email) = 'mudmy.app@gmail.com'
+      )
+  );
+$$;
+
+revoke all on function public.is_admin_user(text) from public;
+grant execute on function public.is_admin_user(text) to authenticated;
+
+create or replace function public.current_user_is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select public.is_admin_user(auth.uid()::text);
+$$;
+
+revoke all on function public.current_user_is_admin() from public;
+grant execute on function public.current_user_is_admin() to authenticated;
+
+create policy "Admin users can read all users"
+on public.users for select
+using (
+  auth.role() = 'service_role'
+  or auth.uid()::text = id
+  or public.current_user_is_admin()
+);
+
+create policy "Admin users can update all users"
+on public.users for update
+using (
+  auth.role() = 'service_role'
+  or auth.uid()::text = id
+  or public.current_user_is_admin()
+)
+with check (
+  auth.role() = 'service_role'
+  or auth.uid()::text = id
+  or public.current_user_is_admin()
+);
+
+create policy "Admin users can read all pins"
+on public.pins for select
+using (
+  auth.role() = 'service_role'
+  or public.current_user_is_admin()
+  or true
+);
+
+create policy "Admin users can delete all pins"
+on public.pins for delete
+using (
+  auth.role() = 'service_role'
+  or public.current_user_is_admin()
+);
+
+-- ---------------------------------------------------------------------------
+-- 9) SECURITY NOTE: do not expose service role to frontend
 -- ---------------------------------------------------------------------------
 -- Keep SUPABASE_SERVICE_ROLE_KEY only in server-side trusted environments.
 -- Do not ship it in the browser, mobile app, or public build artifacts.

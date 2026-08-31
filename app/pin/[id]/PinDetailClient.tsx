@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils'
 import { 
   ShoppingBag, Wrench, Briefcase, HeartHandshake, Building2, Car,
   Search, Home, HandHelping, Key, UserPlus, AlertTriangle, Truck,
-  Copy, Check, Fuel
+  Copy, Check, Fuel, PawPrint
 } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
 import { useAuth } from '@/contexts/auth-context'
@@ -52,7 +52,8 @@ const ICON_MAP: Record<string, React.ElementType> = {
   UserPlus,
   AlertTriangle,
   Truck,
-  Fuel
+  Fuel,
+  PawPrint
 }
 
 export function PinDetailClient({ pin, relatedPins }: { pin: Pin, relatedPins: Pin[] }) {
@@ -192,13 +193,14 @@ export function PinDetailClient({ pin, relatedPins }: { pin: Pin, relatedPins: P
           {/* Left / Main Content */}
           <div className="lg:col-span-2 space-y-0 md:space-y-8">
             {/* Image Gallery - Full Screen Premium Style */}
-            <div className="relative md:rounded-[3rem] overflow-hidden bg-gradient-to-br from-zinc-100 to-orange-50 dark:from-zinc-900 dark:to-zinc-800 aspect-[3/2] md:aspect-video shadow-2xl shadow-orange-200/50 dark:shadow-black/30 border border-orange-100 dark:border-white/5">
+            <div className="relative md:rounded-[3rem] overflow-hidden bg-white dark:bg-zinc-900 aspect-[3/2] md:aspect-video shadow-2xl shadow-orange-200/50 dark:shadow-black/30 border border-orange-100 dark:border-white/5">
               {pin.images.length > 0 ? (
                 <>
                   <img
                     src={pin.images[imgIdx]}
                     alt={pin.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover opacity-100"
+                    style={{ filter: 'none', opacity: 1, mixBlendMode: 'normal', backgroundColor: 'white' }}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80'; // Fallback
@@ -366,10 +368,10 @@ export function PinDetailClient({ pin, relatedPins }: { pin: Pin, relatedPins: P
               
               <div className="mt-8 rounded-3xl overflow-hidden bg-gradient-to-br from-zinc-100 to-orange-50 dark:from-zinc-800 dark:to-zinc-900 h-56 border border-orange-100 dark:border-white/10 relative group shadow-xl shadow-orange-200/50 dark:shadow-black/30">
                 <div 
-                  className="absolute inset-0 bg-cover bg-center brightness-90 transition-transform duration-700 group-hover:scale-105" 
-                  style={{ backgroundImage: "url('https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80')" }} 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" 
+                  style={{ backgroundImage: "url('https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80')", filter: 'none', backgroundColor: 'white' }} 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent" />
                 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Link href={`/explore?lat=${pin.lat}&lng=${pin.lng}&pin=${pin.id}`}>

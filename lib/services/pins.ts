@@ -111,6 +111,7 @@ export async function getAllPins(category?: PinCategory | 'all', blockedUserIds:
     let query = supabase
       .from('pins')
       .select('*')
+      .not('status', 'eq', 'pending_payment')
       .in('status', ['active', 'paid'])
       .or(`expires_at.is.null,expires_at.gt.${now}`)
       .order('created_at', { ascending: false });

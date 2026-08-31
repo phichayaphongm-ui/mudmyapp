@@ -18,7 +18,12 @@ function mapRowToConversation(row: any): Conversation {
   }
 }
 
+const CHAT_IMAGE_RETENTION_MS = 7 * 24 * 60 * 60 * 1000
+
 function mapRowToMessage(row: any): Message {
+  const createdAt = row.created_at ? new Date(row.created_at).getTime() : 0
+  const isExpired = !!row.image && createdAt > 0 && Date.now() - createdAt > CHAT_IMAGE_RETENTION_MS
+
   return {
     id: row.id,
     conversationId: row.conversation_id,
@@ -26,7 +31,7 @@ function mapRowToMessage(row: any): Message {
     senderName: row.sender_name,
     senderAvatar: row.sender_avatar,
     text: row.text,
-    image: row.image || null,
+    image: isExpired ? null : (row.image || null),
     createdAt: row.created_at,
   }
 }

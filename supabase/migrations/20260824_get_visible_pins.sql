@@ -8,6 +8,7 @@ AS $$
   SELECT p.*
   FROM public.pins p
   WHERE p.status IN ('active','paid')
+    AND p.status <> 'pending_payment'
     AND public.is_pin_visible_now(p.id)
   ORDER BY p.created_at DESC;
 $$;

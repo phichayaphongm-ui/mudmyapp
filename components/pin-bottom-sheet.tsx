@@ -4,7 +4,7 @@ import Link from 'next/link'
 import {
   X, MapPin, Phone, Clock, Eye, ChevronLeft, ChevronRight, Star, Zap, MessageCircle, Share2, Heart, Lock,
   ShoppingBag, Wrench, Briefcase, HeartHandshake, Building2, Car,
-  Search, Home, HandHelping, Key, UserPlus, AlertTriangle, Truck, Sparkles, Navigation
+  Search, Home, HandHelping, Key, UserPlus, AlertTriangle, Truck, Sparkles, Navigation, PawPrint
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -37,7 +37,8 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Key,
   UserPlus,
   AlertTriangle,
-  Truck
+  Truck,
+  PawPrint
 }
 
 interface PinBottomSheetProps {
@@ -205,7 +206,6 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
                 <CategoryIcon className="w-16 h-16 text-white/20" />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-50 via-zinc-50/20 to-black/45 dark:from-zinc-950 dark:via-zinc-950/30 dark:to-black/55" />
 
             <div
               className="absolute top-0 left-0 right-0 flex items-start justify-between px-4 pt-[max(0.85rem,env(safe-area-inset-top))]"

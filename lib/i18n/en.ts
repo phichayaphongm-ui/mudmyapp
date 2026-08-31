@@ -300,6 +300,8 @@ export const en: Dictionary = {
     events: 'Events',
     news: 'Community News',
     emergency: 'Emergency',
+    lodging: 'Accommodation',
+    pets: 'Pets',
     buy: 'Buy Items',
     delivery: 'Delivery Service',
     hiring: 'Hiring/Jobs',
@@ -406,6 +408,8 @@ export const en: Dictionary = {
         events: 'e.g. Temple Fair / Community Market',
         news: 'e.g. Road closure notice / Community news',
         emergency: 'e.g. Car break down, out of gas...',
+        lodging: 'e.g. Homestay / resort / hotel / apartment / rental house',
+        pets: 'e.g. Find dog-cat home / pet boarding / pet supplies / pet care',
       },
       description: {
         sell: 'Describe product details, condition...',
@@ -418,6 +422,8 @@ export const en: Dictionary = {
         events: 'Event details, time, and location...',
         news: 'Details of the news you want to share with the community...',
         emergency: 'Describe the issue, location, car color...',
+        lodging: 'Describe room type, price, facilities, location, and stay conditions...',
+        pets: 'Describe the animal type, price, care details, space, and services available for pets...',
       }
     }
   },
