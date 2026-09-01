@@ -168,11 +168,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+const buildRedirectTo = (fallbackPath: string) => {
+  if (typeof window === 'undefined') {
+    const rawUrl = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/^\uFEFF/, '').trim();
+    const base = rawUrl || 'http://localhost:3000';
+    return `${base}${fallbackPath}`;
+  }
+  return `${window.location.origin}${fallbackPath}`;
+};
+
   const signInWithGoogle = async () => {
     setError(null);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: {
+        redirectTo: buildRedirectTo('/auth/callback'),
+        queryParams: { access_type: 'offline', prompt: 'consent' },
+      },
     });
     if (error) {
       setError(error);
@@ -184,7 +196,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: {
+        redirectTo: buildRedirectTo('/auth/callback'),
+      },
     });
     if (error) {
       setError(error);
@@ -198,7 +212,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'line' as any, // LINE must be configured as Custom OIDC provider in Supabase Dashboard
-        options: { redirectTo: `${window.location.origin}/dashboard` },
+        options: {
+          redirectTo: buildRedirectTo('/auth/callback'),
+        },
       });
       if (error) throw error;
     } catch (err: any) {
