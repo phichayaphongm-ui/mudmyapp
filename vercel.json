@@ -1,5 +1,13 @@
 {
   "installCommand": "pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm run build",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "nodeVersion": "20.x",
+  "outputDirectory": ".next",
+  "regions": ["sin1"],
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  }
 }
