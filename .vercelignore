@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+.uploads
+*.log
+*.tsbuildinfo
+Mobile Apps
+mudmy_app
+.env.local
+scratch/
