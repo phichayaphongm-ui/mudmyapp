@@ -1,13 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// Strip BOM and whitespace that may appear in Vercel env vars
+const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || '').replace(/^\uFEFF/, '').trim();
+const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '').replace(/^\uFEFF/, '').trim();
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check .env.local file.');
+  // Warn instead of throw — throwing crashes static page generation at build time
+  console.warn('[Supabase] Missing environment variables: NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Use placeholder values during build if env vars are missing to avoid crash
+const _url = supabaseUrl || 'https://placeholder.supabase.co';
+const _key = supabaseAnonKey || 'placeholder_key';
+
+export const supabase = createClient(_url, _key, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
