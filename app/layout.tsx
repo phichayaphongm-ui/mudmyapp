@@ -26,8 +26,15 @@ const prompt = Prompt({
   variable: '--font-prompt',
 })
 
+// Strip BOM (﻿) and whitespace that may appear in Vercel env vars
+const rawAppUrl = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/^\uFEFF/, '').trim()
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://mudmy.app'),
+  metadataBase: new URL(
+    rawAppUrl && !rawAppUrl.includes('localhost')
+      ? rawAppUrl
+      : 'https://mudmyapp.vercel.app'
+  ),
   title: 'หมุดหมาย (Mudmy) | ตลาดชุมชนบนแผนที่ ค้นหาสินค้าและบริการใกล้บ้าน',
   description: 'หมุดหมาย (Mudmy) คือแพลตฟอร์มตลาดชุมชนบนแผนที่สำหรับคนไทย ค้นหาสินค้า ร้านค้า งาน บริการ และโอกาสใกล้บ้าน พร้อมปักหมุดธุรกิจของคุณให้คนในพื้นที่ค้นพบได้ง่าย',
   keywords: [
