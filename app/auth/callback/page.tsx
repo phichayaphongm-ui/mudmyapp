@@ -5,9 +5,21 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
+const CANONICAL_ENV_URL = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/^\uFEFF/, '').trim();
+
+function getCanonicalHost(): string | null {
+  if (!CANONICAL_ENV_URL) return null;
+  try {
+    return new URL(CANONICAL_ENV_URL).host;
+  } catch {
+    return null;
+  }
+}
+
 function CallbackInner() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string>('กำลังตรวจสอบข้อมูลจาก Google และเตรียมเข้าสู่ระบบให้กับคุณ');
 
   useEffect(() => {
     let cancelled = false;
@@ -22,6 +34,21 @@ function CallbackInner() {
           if (sessionError && !cancelled) {
             console.warn('Auth session parse warning:', sessionError.message);
           }
+        }
+
+        const canonicalHost = getCanonicalHost();
+        if (
+          canonicalHost &&
+          window.location.hostname !== 'localhost' &&
+          window.location.host !== canonicalHost
+        ) {
+          if (!cancelled) {
+            setMessage('กำลังส่งต่อไปยัง URL หลักของแอปพลิเคชัน...');
+          }
+          const next = params.get('next') || '/dashboard';
+          const newUrl = `${CANONICAL_ENV_URL}/auth/callback${params.toString() ? `?${params.toString()}` : ''}${hash}`;
+          window.location.replace(newUrl);
+          return;
         }
 
         const next = params.get('next') || '/dashboard';
@@ -70,7 +97,7 @@ function CallbackInner() {
           <p className="text-sm text-slate-500 font-medium">
             {error
               ? `Error: ${error}. กำลังกลับไปหน้า Login อัตโนมัติ`
-              : 'กำลังตรวจสอบข้อมูลจาก Google และเตรียมเข้าสู่ระบบให้กับคุณ'}
+              : message}
           </p>
         </div>
       </div>

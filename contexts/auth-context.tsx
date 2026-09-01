@@ -168,10 +168,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+const getCanonicalAppUrl = (): string => {
+  const rawUrl = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/^\uFEFF/, '').trim();
+  return rawUrl || '';
+};
+
 const buildRedirectTo = (fallbackPath: string) => {
+  const canonical = getCanonicalAppUrl();
+  const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  if (canonical && !isLocal) {
+    return `${canonical}${fallbackPath}`;
+  }
   if (typeof window === 'undefined') {
-    const rawUrl = (process.env.NEXT_PUBLIC_APP_URL || '').replace(/^\uFEFF/, '').trim();
-    const base = rawUrl || 'http://localhost:3000';
+    const base = canonical || 'http://localhost:3000';
     return `${base}${fallbackPath}`;
   }
   return `${window.location.origin}${fallbackPath}`;
