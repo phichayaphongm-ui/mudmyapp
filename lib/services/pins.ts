@@ -332,8 +332,6 @@ export async function updatePin(pinId: string, updateData: Partial<Pin>): Promis
   if (updateData.lastCheckedInAt !== undefined) update.last_checked_in_at = updateData.lastCheckedInAt;
   if (updateData.ownerAvatar !== undefined) update.owner_avatar = updateData.ownerAvatar;
   if (updateData.ownerName !== undefined) update.owner_name = updateData.ownerName;
-  if (updateData.views !== undefined) update.views = updateData.views;
-  if (updateData.clicks !== undefined) update.clicks = updateData.clicks;
   if (updateData.rating !== undefined) update.rating = updateData.rating;
   if (updateData.reviewCount !== undefined) update.review_count = updateData.reviewCount;
   if (updateData.favoriteCount !== undefined) update.favorite_count = updateData.favoriteCount;

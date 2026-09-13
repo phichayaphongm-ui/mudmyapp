@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { 
   ArrowLeft, Phone, MessageCircle, Facebook, Star, 
   Shield, Calendar, MapPin, Award, Crown,
-  Loader2, ExternalLink, History, Heart, Trash2, Lock, Mail
+  Loader2, ExternalLink, History, Heart, Trash2, Lock, Mail, UserPlus, UserCheck
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useAuth } from '@/contexts/auth-context'
-import { toggleBlockUser, getPublicUserProfile } from '@/lib/services/users'
+import { toggleBlockUser, getPublicUserProfile, toggleUserFollow } from '@/lib/services/users'
 import { getPublicUserPins } from '@/lib/services/pins'
 import { getUserFavorites, removeFavorite } from '@/lib/services/favorites'
 import { toast } from 'sonner'
@@ -46,6 +46,7 @@ export default function PublicProfilePage() {
   const [loading, setLoading] = useState(true)
   const [loadingFavs, setLoadingFavorites] = useState(false)
   const [blocking, setBlocking] = useState(false)
+  const [following, setFollowing] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deletingPinId, setDeletingPinId] = useState<string | null>(null)
@@ -53,6 +54,25 @@ export default function PublicProfilePage() {
 
   const isBlocked = user?.blockedUsers?.includes(uid) || false
   const isMe = user?.id === uid
+
+  const handleFollowToggle = async () => {
+    if (!user || !profile || following) return
+    setFollowing(true)
+    try {
+      const result = await toggleUserFollow(uid)
+      setProfile((current) => current ? {
+        ...current,
+        isFollowing: result.isFollowing,
+        followerCount: result.followerCount,
+      } : current)
+      toast.success(result.isFollowing ? t('profile.followSuccess') : t('profile.unfollowSuccess'))
+    } catch (err: any) {
+      console.error('FOLLOW_TOGGLE_ERROR:', err)
+      toast.error(err?.message || t('profile.updateError'))
+    } finally {
+      setFollowing(false)
+    }
+  }
 
   useEffect(() => {
     async function fetchProfile() {
@@ -227,6 +247,21 @@ export default function PublicProfilePage() {
 
             {!isMe && user && (
               <>
+                <Button
+                  variant={profile.isFollowing ? 'secondary' : 'default'}
+                  className={cn(
+                    'rounded-2xl h-12 gap-2 min-w-[120px] transition-all',
+                    !profile.isFollowing && 'bg-primary text-primary-foreground hover:bg-primary/90',
+                  )}
+                  disabled={following}
+                  onClick={handleFollowToggle}
+                >
+                  {following ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                    profile.isFollowing ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />
+                  )}
+                  {profile.isFollowing ? t('profile.unfollow') : t('profile.follow')}
+                </Button>
+
                 <Button 
                   variant="outline" 
                   className={cn(
@@ -414,6 +449,14 @@ export default function PublicProfilePage() {
               <div className="bg-card/50 p-5 rounded-[2rem] border border-border/50 text-center">
                 <p className="text-2xl font-black text-secondary">{profile.heroCasesCount || 0}</p>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">{t('profile.jobsHelped')}</p>
+              </div>
+              <div className="bg-card/50 p-5 rounded-[2rem] border border-border/50 text-center">
+                <p className="text-2xl font-black text-primary">{profile.followerCount || 0}</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">{t('profile.followers')}</p>
+              </div>
+              <div className="bg-card/50 p-5 rounded-[2rem] border border-border/50 text-center">
+                <p className="text-2xl font-black text-secondary">{profile.followingCount || 0}</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-1">{t('profile.following')}</p>
               </div>
             </div>
           </section>

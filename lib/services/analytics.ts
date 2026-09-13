@@ -13,6 +13,18 @@ export interface DailyAnalytics {
   clicks: number;
 }
 
+function getVisitorKey(): string {
+  if (typeof window === 'undefined') return 'server'
+  const storageKey = 'mudmy-analytics-visitor'
+  const existing = window.localStorage.getItem(storageKey)
+  if (existing) return existing
+  const generated = typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  window.localStorage.setItem(storageKey, generated)
+  return generated
+}
+
 /**
  * Log an analytics event (view or click) for a pin.
  * Events are stored in the pin_events table.
@@ -22,11 +34,12 @@ export async function logAnalyticsEvent(
   type: AnalyticsEventType
 ): Promise<void> {
   try {
-    await supabase.from('pin_events').insert({
-      pin_id: pinId,
-      type,
-      timestamp: new Date().toISOString(),
-    });
+    const { error } = await supabase.rpc('record_pin_event', {
+      p_pin_id: pinId,
+      p_type: type,
+      p_visitor_key: getVisitorKey(),
+    })
+    if (error) throw error
   } catch (error) {
     console.error('Error logging analytics event:', error);
     // Non-blocking

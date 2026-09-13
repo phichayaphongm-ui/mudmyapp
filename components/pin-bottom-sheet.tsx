@@ -538,18 +538,18 @@ export function PinBottomSheet({ pin, onClose }: PinBottomSheetProps) {
                             } catch (err) {
                               const message = err instanceof Error ? err.message : String(err)
                               if (message.toLowerCase().includes('already reported')) {
-                                toast.info('คุณรายงานหมุดนี้ไปแล้ว')
+                                toast.info(t('pinDetail.alreadyReported'))
                                 setIsReportOpen(false)
                               } else {
                                 console.error('report error', err)
-                                toast.error(message || 'เกิดข้อผิดพลาด')
+                                toast.error(message || t('pinDetail.reportError'))
                               }
                             } finally {
                               setReportSubmitting(false)
                             }
                           }}
                         >
-                          {reportSubmitting ? 'กำลังส่งรายงาน...' : t('pinDetail.reportPin')}
+                          {reportSubmitting ? t('pinDetail.reportSubmitting') : t('pinDetail.reportPin')}
                         </Button>
                       </DialogFooter>
                     </DialogContent>

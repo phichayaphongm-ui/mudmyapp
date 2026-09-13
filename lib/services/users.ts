@@ -49,6 +49,23 @@ export async function getPublicUserProfile(uid: string): Promise<AppUser | null>
   return data ? mapRowToUser(data) : null;
 }
 
+export async function toggleUserFollow(targetId: string): Promise<{
+  isFollowing: boolean
+  followerCount: number
+  followingCount: number
+}> {
+  const { data, error } = await supabase.rpc('toggle_user_follow', { p_target_id: targetId })
+  if (error) {
+    console.error('Error toggling user follow:', formatSupabaseError(error))
+    throw error
+  }
+  return {
+    isFollowing: data?.is_following === true,
+    followerCount: Number(data?.follower_count ?? 0),
+    followingCount: Number(data?.following_count ?? 0),
+  }
+}
+
 export async function createUserProfile(uid: string, data: Partial<AppUser>): Promise<AppUser> {
   const newUser = {
     id: uid,

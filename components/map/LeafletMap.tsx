@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 import type { Pin } from '@/lib/types'
 import { useLanguage } from '@/contexts/language-context'
 import { ArrowRight } from 'lucide-react'
+import { getThailandMapBounds } from '@/lib/utils/geo'
 
 // Fix Leaflet marker icons in Next.js
 const DefaultIcon = L.icon({
@@ -314,22 +315,22 @@ export default function LeafletMap({
 
   // Keep all layers key-free so the map remains usable in production.
   let tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-  let attribution = '&copy; OpenStreetMap contributors'
+  let attribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
 
   const useDarkTiles = mapStyle === 'dark' || (theme === 'dark' && mapStyle === 'standard')
 
   if (useDarkTiles) {
     tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-    attribution = '&copy; OpenStreetMap contributors'
+    attribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
   } else if (mapStyle === 'voyager') {
     tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
-    attribution = '&copy; Esri &amp; OpenStreetMap contributors'
+    attribution = '&copy; <a href="https://www.esri.com/en-us/legal/terms/full-master-agreement" target="_blank" rel="noopener noreferrer">Esri</a> &amp; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
   } else if (mapStyle === 'positron') {
     tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-    attribution = '&copy; OpenStreetMap contributors'
+    attribution = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
   } else if (mapStyle === 'satellite') {
     tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-    attribution = '&copy; Esri &amp; Maxar'
+    attribution = '&copy; <a href="https://www.esri.com/en-us/legal/terms/full-master-agreement" target="_blank" rel="noopener noreferrer">Esri</a> &amp; <a href="https://www.maxar.com/about/legal" target="_blank" rel="noopener noreferrer">Maxar</a>'
   }
 
   const isDark = useDarkTiles
@@ -345,6 +346,9 @@ export default function LeafletMap({
         center={initialMapCenter}
         zoom={zoom}
         scrollWheelZoom={true}
+        attributionControl={true}
+        maxBounds={getThailandMapBounds()}
+        maxBoundsViscosity={1}
         style={{ height: '100%', width: '100%', zIndex: 0 }}
         maxZoom={19}
         minZoom={3}

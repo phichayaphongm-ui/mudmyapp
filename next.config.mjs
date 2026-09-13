@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     unoptimized: true,
   },
@@ -19,10 +16,26 @@ const nextConfig = {
             value: 'same-origin-allow-popups',
           },
           {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(self), payment=(self)',
+          },
+          {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self' https:",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' blob: va.vercel-scripts.com vercel.com *.vercel.com vercel.live *.vercel.app *.vercel.sh unpkg.com cdnjs.cloudflare.com",
+              "script-src 'self' 'unsafe-inline' blob: va.vercel-scripts.com vercel.com *.vercel.com vercel.live *.vercel.app *.vercel.sh unpkg.com cdnjs.cloudflare.com",
               "style-src 'self' 'unsafe-inline' va.vercel-scripts.com vercel.com *.vercel.com unpkg.com cdnjs.cloudflare.com fonts.googleapis.com",
               "img-src 'self' blob: data: https: *.googleusercontent.com *.ggpht.com",
               "font-src 'self' data: fonts.gstatic.com fonts.googleapis.com",
@@ -32,6 +45,7 @@ const nextConfig = {
               "form-action 'self' accounts.google.com",
               "object-src 'none'",
               "base-uri 'self'",
+              "frame-ancestors 'self'",
               "manifest-src 'self'",
               "media-src 'self' data: blob: https:",
             ].join('; '),

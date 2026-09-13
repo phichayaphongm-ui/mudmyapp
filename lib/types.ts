@@ -45,6 +45,9 @@ export interface User {
   rating: number
   reviewCount: number
   heroCasesCount: number
+  followerCount?: number
+  followingCount?: number
+  isFollowing?: boolean
   heroCases?: HeroCase[]
   province?: string // For ranking by province
   fcmToken?: string | null

@@ -33,15 +33,17 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     rawAppUrl && !rawAppUrl.includes('localhost')
       ? rawAppUrl
-      : 'https://mudmyapp.vercel.app'
+      : 'https://mudmy.app'
   ),
   title: {
-    default: 'หมุดหมาย (Mudmy) | ตลาดชุมชนไทยบนแผนที่',
+    default: 'แอปหมุดหมาย (Mudmy) | ตลาดชุมชนไทยบนแผนที่',
     template: '%s | หมุดหมาย Mudmy',
   },
-  description: 'หมุดหมาย (Mudmy) คือแพลตฟอร์มชุมชนไทยบนแผนที่สำหรับค้นหาสินค้า ร้านค้า งาน บริการ ข่าวสาร และความช่วยเหลือใกล้บ้าน พร้อมปักหมุดให้คนในพื้นที่ค้นพบ',
+  description: 'แอปหมุดหมาย (Mudmy) คือแพลตฟอร์มชุมชนไทยบนแผนที่สำหรับค้นหาสินค้า ร้านค้า งาน บริการ ข่าวสาร และความช่วยเหลือใกล้บ้าน พร้อมปักหมุดให้คนในพื้นที่ค้นพบ',
   keywords: [
     'หมุดหมาย',
+    'แอปหมุดหมาย',
+    'หมุดหมายแอป',
     'Mudmy',
     'ตลาดชุมชน',
     'ตลาดออนไลน์ใกล้บ้าน',
@@ -65,7 +67,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
   openGraph: {
     title: 'หมุดหมาย (Mudmy) | ตลาดชุมชนบนแผนที่',
-    description: 'ค้นหาสินค้า บริการ ร้านค้า งาน และโอกาสใกล้บ้านบนแผนที่เดียว พร้อมปักหมุดให้ชุมชนค้นพบคุณ',
+    description: 'แอปหมุดหมายสำหรับค้นหาสินค้า บริการ ร้านค้า งาน และโอกาสใกล้บ้านบนแผนที่เดียว พร้อมปักหมุดให้ชุมชนค้นพบคุณ',
     locale: 'th_TH',
     type: 'website',
     siteName: 'หมุดหมาย (Mudmy)',
@@ -74,7 +76,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'หมุดหมาย (Mudmy) | ตลาดชุมชนบนแผนที่',
-    description: 'ค้นหาสินค้า บริการ และโอกาสใกล้บ้าน พร้อมปักหมุดธุรกิจของคุณให้คนในพื้นที่ค้นพบ',
+    description: 'แอปหมุดหมายสำหรับค้นหาสินค้า บริการ และโอกาสใกล้บ้าน พร้อมปักหมุดธุรกิจของคุณให้คนในพื้นที่ค้นพบ',
     images: ['/landingapp.jpg'],
   },
   icons: {
@@ -142,7 +144,7 @@ export default function RootLayout({
                 '@type': 'WebApplication',
                 name: 'หมุดหมาย (Mudmy)',
                 url: 'https://mudmy.app',
-                description: 'แพลตฟอร์มชุมชนไทยบนแผนที่สำหรับค้นหาสินค้า บริการ ร้านค้า งาน ข่าวสาร และความช่วยเหลือใกล้บ้าน',
+                description: 'แอปหมุดหมาย หรือหมุดหมายแอป เป็นแพลตฟอร์มชุมชนไทยบนแผนที่สำหรับค้นหาสินค้า บริการ ร้านค้า งาน ข่าวสาร และความช่วยเหลือใกล้บ้าน',
                 applicationCategory: 'Marketplace',
                 operatingSystem: 'Web',
                 inLanguage: 'th-TH',
@@ -159,7 +161,7 @@ export default function RootLayout({
                 name: 'หมุดหมาย (Mudmy)',
                 url: 'https://mudmy.app',
                 logo: 'https://mudmy.app/logo1.png',
-                description: 'แพลตฟอร์มชุมชนไทยที่เชื่อมโยงผู้คน สินค้า บริการ งาน ข่าวสาร และโอกาสใกล้บ้าน',
+                description: 'แอปหมุดหมายที่เชื่อมโยงผู้คน สินค้า บริการ งาน ข่าวสาร และโอกาสใกล้บ้านในประเทศไทย',
                 areaServed: { '@type': 'Country', name: 'Thailand' },
                 knowsAbout: ['ตลาดชุมชน', 'สินค้าและบริการใกล้บ้าน', 'งานในชุมชน', 'ข่าวสารชุมชน'],
               },

@@ -16,6 +16,11 @@ function getCanonicalHost(): string | null {
   }
 }
 
+function getSafeNext(value: string | null): string {
+  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/dashboard';
+  return value;
+}
+
 function CallbackInner() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -45,13 +50,12 @@ function CallbackInner() {
           if (!cancelled) {
             setMessage('กำลังส่งต่อไปยัง URL หลักของแอปพลิเคชัน...');
           }
-          const next = params.get('next') || '/dashboard';
           const newUrl = `${CANONICAL_ENV_URL}/auth/callback${params.toString() ? `?${params.toString()}` : ''}${hash}`;
           window.location.replace(newUrl);
           return;
         }
 
-        const next = params.get('next') || '/dashboard';
+        const next = getSafeNext(params.get('next'));
         const err = params.get('error');
         const errDesc = params.get('error_description');
 

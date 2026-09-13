@@ -24,7 +24,7 @@ import {
 import { useLanguage } from '@/contexts/language-context'
 import { useAuth } from '@/contexts/auth-context'
 import { searchUsers } from '@/lib/services/users'
-import { deletePin, incrementPinViews, incrementPinClicks, updatePin } from '@/lib/services/pins'
+import { deletePin, updatePin } from '@/lib/services/pins'
 import { supabase } from '@/lib/supabase'
 import { logAnalyticsEvent } from '@/lib/services/analytics'
 import { toast } from 'sonner'
@@ -89,13 +89,11 @@ export function PinDetailClient({ pin, relatedPins }: { pin: Pin, relatedPins: P
   useEffect(() => {
     if (!viewTracked.current) {
       viewTracked.current = true
-      incrementPinViews(pin.id)
       logAnalyticsEvent(pin.id, 'view')
     }
   }, [pin.id])
 
   const handlePhoneClick = () => {
-    incrementPinClicks(pin.id)
     logAnalyticsEvent(pin.id, 'click')
   }
 

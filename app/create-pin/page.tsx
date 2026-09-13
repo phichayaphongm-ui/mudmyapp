@@ -23,6 +23,7 @@ import { compressImage } from '@/lib/utils/image'
 import { incrementUserActivePins, getUserProfile, updateUserProfile } from '@/lib/services/users'
 import { CATEGORIES, type PinCategory, type Pin } from '@/lib/types'
 import { cn } from '@/lib/utils'
+import { isThailandCoordinate, isWithinThailandBounds } from '@/lib/utils/geo'
 import dynamic from 'next/dynamic'
 import { toast } from 'sonner'
 
@@ -175,6 +176,36 @@ function CreatePinContent() {
       toast.error(t('createPin.alerts.loginRequired'))
       router.push('/login')
       return;
+    }
+
+    if (!isWithinThailandBounds(lat, lng) || !(await isThailandCoordinate(lat, lng))) {
+      toast.error(t('map.thailandOnly'))
+      return
+    }
+
+    if (!navigator.geolocation) {
+      toast.error(t('map.thailandUserOnly'))
+      return
+    }
+
+    let currentLocation: GeolocationPosition
+    try {
+      currentLocation = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000,
+        })
+      })
+    } catch {
+      toast.error(t('map.thailandUserOnly'))
+      return
+    }
+
+    const { latitude, longitude } = currentLocation.coords
+    if (!isWithinThailandBounds(latitude, longitude) || !(await isThailandCoordinate(latitude, longitude))) {
+      toast.error(t('map.thailandUserOnly'))
+      return
     }
 
     setPaymentLoading(true)

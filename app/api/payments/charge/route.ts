@@ -1,8 +1,14 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { cookies } from 'next/headers';
+import { createServerClient } from '@supabase/ssr';
+import { checkRateLimit, getRequestIdentity } from '@/lib/server/rate-limit';
 
 export async function POST(request: Request) {
   try {
+    if (!checkRateLimit(`payment-charge:${getRequestIdentity(request, 'unknown')}`, 5, 60_000)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
     const { amount, email, description, userId, pinId, paymentId } = await request.json();
 
     if (!process.env.STRIPE_SECRET_KEY) {
@@ -16,13 +22,47 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing payment details' }, { status: 400 });
     }
 
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll: () => cookieStore.getAll(),
+          setAll: (cookiesToSet) => cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options)),
+        },
+      },
+    );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || user.id !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data: payment, error: paymentError } = await supabase
+      .from('payments')
+      .select('id, user_id, pin_id, amount, status')
+      .eq('id', paymentId)
+      .eq('user_id', user.id)
+      .eq('pin_id', pinId)
+      .maybeSingle();
+    if (paymentError || !payment) {
+      return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
+    }
+    if (payment.status === 'paid') {
+      return NextResponse.json({ error: 'Payment already completed' }, { status: 409 });
+    }
+
     const numericAmount = Number(amount ?? 10);
     if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
       return NextResponse.json({ error: 'Invalid payment amount' }, { status: 400 });
     }
+    if (Math.round(numericAmount * 100) !== Math.round(Number(payment.amount) * 100)) {
+      return NextResponse.json({ error: 'Payment amount does not match the payment record' }, { status: 400 });
+    }
 
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY.trim());
-    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://mudmy.app';
+    const origin = configuredOrigin.replace(/\/$/, '');
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       customer_email: email || undefined,
@@ -43,9 +83,9 @@ export async function POST(request: Request) {
       ok: true,
       url: session.url,
       sessionId: session.id,
-    });
+    }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('Stripe charge API error:', error);
+    return NextResponse.json({ error: 'Unable to create payment session' }, { status: 500 });
   }
 }

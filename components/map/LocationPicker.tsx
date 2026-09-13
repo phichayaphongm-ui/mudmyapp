@@ -7,6 +7,7 @@ import { useEffect } from 'react'
 import { MapPin, Locate } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/contexts/language-context'
+import { getThailandMapBounds, isWithinThailandBounds } from '@/lib/utils/geo'
 
 // Fix Leaflet marker icons
 const DefaultIcon = L.icon({
@@ -103,6 +104,7 @@ const createCategoryIcon = (category?: string) => {
 }
 
 function LocationMarker({ lat, lng, onChange, onAddressFound, category }: LocationPickerProps) {
+  const { t } = useLanguage()
   const fetchAddress = async (lat: number, lng: number) => {
     if (!onAddressFound) return
     try {
@@ -126,6 +128,10 @@ function LocationMarker({ lat, lng, onChange, onAddressFound, category }: Locati
 
   const _map = useMapEvents({
     click(e) {
+      if (!isWithinThailandBounds(e.latlng.lat, e.latlng.lng)) {
+        alert(t('map.thailandOnly'))
+        return
+      }
       onChange(e.latlng.lat, e.latlng.lng)
       fetchAddress(e.latlng.lat, e.latlng.lng)
     },
@@ -140,6 +146,11 @@ function LocationMarker({ lat, lng, onChange, onAddressFound, category }: Locati
         dragend: (e) => {
           const marker = e.target
           const position = marker.getLatLng()
+          if (!isWithinThailandBounds(position.lat, position.lng)) {
+            marker.setLatLng([lat, lng])
+            alert(t('map.thailandOnly'))
+            return
+          }
           onChange(position.lat, position.lng)
           fetchAddress(position.lat, position.lng)
         }
@@ -162,6 +173,10 @@ export default function LocationPicker({ lat, lng, onChange, onAddressFound, cat
     if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
+          if (!isWithinThailandBounds(pos.coords.latitude, pos.coords.longitude)) {
+            alert(t('map.thailandUserOnly'))
+            return
+          }
           onChange(pos.coords.latitude, pos.coords.longitude)
         },
         (err) => {
@@ -188,6 +203,8 @@ export default function LocationPicker({ lat, lng, onChange, onAddressFound, cat
       <MapContainer
         center={[lat, lng]}
         zoom={13}
+        maxBounds={getThailandMapBounds()}
+        maxBoundsViscosity={1}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer

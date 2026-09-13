@@ -128,6 +128,77 @@ create table if not exists public.pins (
 alter table public.pins add column if not exists show_on_map boolean not null default true;
 alter table public.pins add column if not exists display_schedule jsonb;
 
+-- Restrict new and updated pins to Thailand's geographic bounding box.
+-- NOT VALID preserves legacy rows while enforcing the rule for new writes.
+alter table public.pins drop constraint if exists pins_thailand_bounds;
+alter table public.pins add constraint pins_thailand_bounds
+  check (lat between 5.61 and 20.47 and lng between 97.34 and 105.65) not valid;
+
+-- USER FOLLOWS TABLE
+create table if not exists public.user_follows (
+  follower_id text not null references public.users(id) on delete cascade,
+  following_id text not null references public.users(id) on delete cascade,
+  created_at timestamp with time zone not null default now(),
+  primary key (follower_id, following_id),
+  constraint user_follows_no_self_follow check (follower_id <> following_id)
+);
+
+create index if not exists user_follows_following_id_idx on public.user_follows (following_id);
+create index if not exists user_follows_follower_id_idx on public.user_follows (follower_id);
+alter table public.user_follows enable row level security;
+
+drop policy if exists "Users can read their own follows" on public.user_follows;
+create policy "Users can read their own follows" on public.user_follows for select
+  using (auth.uid()::text = follower_id or auth.uid()::text = following_id);
+
+drop policy if exists "Users can follow from their own account" on public.user_follows;
+create policy "Users can follow from their own account" on public.user_follows for insert
+  with check (auth.role() = 'authenticated' and auth.uid()::text = follower_id);
+
+drop policy if exists "Users can unfollow from their own account" on public.user_follows;
+create policy "Users can unfollow from their own account" on public.user_follows for delete
+  using (auth.role() = 'authenticated' and auth.uid()::text = follower_id);
+
+create or replace function public.toggle_user_follow(p_target_id text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  viewer_id text := auth.uid()::text;
+  is_now_following boolean;
+  target_followers bigint;
+  viewer_following bigint;
+begin
+  if viewer_id is null then raise exception 'Authentication required'; end if;
+  if p_target_id is null or p_target_id = viewer_id then raise exception 'You cannot follow yourself'; end if;
+  if not exists (select 1 from public.users where id = p_target_id) then raise exception 'User not found'; end if;
+
+  if exists (select 1 from public.user_follows where follower_id = viewer_id and following_id = p_target_id) then
+    delete from public.user_follows where follower_id = viewer_id and following_id = p_target_id;
+    is_now_following := false;
+  else
+    insert into public.user_follows (follower_id, following_id)
+    values (viewer_id, p_target_id)
+    on conflict (follower_id, following_id) do nothing;
+    is_now_following := true;
+  end if;
+
+  select count(*) into target_followers from public.user_follows where following_id = p_target_id;
+  select count(*) into viewer_following from public.user_follows where follower_id = viewer_id;
+
+  return jsonb_build_object(
+    'is_following', is_now_following,
+    'follower_count', target_followers,
+    'following_count', viewer_following
+  );
+end;
+$$;
+
+revoke all on function public.toggle_user_follow(text) from public;
+grant execute on function public.toggle_user_follow(text) to authenticated;
+
 -- RLS for Pins
 alter table public.pins enable row level security;
 
@@ -194,9 +265,17 @@ create table if not exists public.pin_events (
   id uuid primary key default gen_random_uuid(),
   pin_id text references public.pins(id) on delete cascade not null,
   type text not null,
+  visitor_key text,
   timestamp timestamp with time zone not null default now(),
   created_at timestamp with time zone not null default now()
 );
+
+alter table public.pin_events add column if not exists visitor_key text;
+alter table public.pin_events drop constraint if exists pin_events_type_check;
+alter table public.pin_events add constraint pin_events_type_check
+  check (type in ('view', 'click'));
+create index if not exists pin_events_dedupe_idx
+  on public.pin_events (pin_id, type, visitor_key, created_at desc);
 
 -- RLS for Pin Events
 alter table public.pin_events enable row level security;
@@ -205,9 +284,48 @@ create policy "Anyone can read pin events"
   on public.pin_events for select
   using (true);
 
-create policy "Anyone can insert pin events"
-  on public.pin_events for insert
-  with check (true);
+drop policy if exists "Anyone can insert pin events" on public.pin_events;
+
+create or replace function public.record_pin_event(
+  p_pin_id text,
+  p_type text,
+  p_visitor_key text default null
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  effective_visitor_key text := coalesce(auth.uid()::text, nullif(left(trim(p_visitor_key), 128), ''));
+  event_recorded boolean := false;
+begin
+  if p_type not in ('view', 'click') then raise exception 'Invalid analytics event type'; end if;
+  if effective_visitor_key is null then raise exception 'Visitor identity is required'; end if;
+  if not exists (select 1 from public.pins where id = p_pin_id and status in ('active', 'paid') and (expires_at is null or expires_at > now())) then
+    return false;
+  end if;
+  if not exists (
+    select 1 from public.pin_events
+    where pin_id = p_pin_id and type = p_type and visitor_key = effective_visitor_key
+      and created_at > now() - interval '10 minutes'
+  ) then
+    insert into public.pin_events (pin_id, type, visitor_key, timestamp)
+    values (p_pin_id, p_type, effective_visitor_key, now());
+    if p_type = 'view' then
+      update public.pins set views = views + 1, updated_at = now() where id = p_pin_id;
+    else
+      update public.pins set clicks = clicks + 1, updated_at = now() where id = p_pin_id;
+    end if;
+    event_recorded := true;
+  end if;
+  return event_recorded;
+end;
+$$;
+
+revoke all on function public.record_pin_event(text, text, text) from public;
+grant execute on function public.record_pin_event(text, text, text) to anon, authenticated;
+revoke update (views, clicks) on public.pins from anon, authenticated;
 
 -- 4. DETAILED REPORTS TABLE
 create table if not exists public.detailed_reports (
@@ -433,6 +551,62 @@ insert into storage.buckets (id, name, public)
 values ('mudmy', 'mudmy', true)
 on conflict (id) do nothing;
 
+insert into storage.buckets (id, name, public)
+values ('mudmy-public', 'mudmy-public', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Public read access for new media files" on storage.objects;
+create policy "Public read access for new media files" on storage.objects for select
+  using (
+    bucket_id = 'mudmy-public'
+    and auth.role() in ('anon', 'authenticated')
+    and (storage.foldername(name))[1] in ('pins', 'profiles', 'reviews')
+    and (storage.foldername(name))[2] is not null
+  );
+
+drop policy if exists "Owners can upload new pin images" on storage.objects;
+create policy "Owners can upload new pin images" on storage.objects for insert
+  with check (bucket_id = 'mudmy-public' and (storage.foldername(name))[1] = 'pins' and (storage.foldername(name))[2] = auth.uid()::text and auth.role() = 'authenticated');
+
+drop policy if exists "Owners can upload new profile avatars" on storage.objects;
+create policy "Owners can upload new profile avatars" on storage.objects for insert
+  with check (bucket_id = 'mudmy-public' and (storage.foldername(name))[1] = 'profiles' and (storage.foldername(name))[2] = auth.uid()::text and auth.role() = 'authenticated');
+
+drop policy if exists "Authenticated users can upload new review images" on storage.objects;
+create policy "Authenticated users can upload new review images" on storage.objects for insert
+  with check (bucket_id = 'mudmy-public' and (storage.foldername(name))[1] = 'reviews' and auth.role() = 'authenticated');
+
+-- New chat images use a separate private bucket and signed URLs.
+insert into storage.buckets (id, name, public)
+values ('mudmy-chats', 'mudmy-chats', false)
+on conflict (id) do update set public = false;
+
+drop policy if exists "Chat participants can upload private images" on storage.objects;
+create policy "Chat participants can upload private images"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'mudmy-chats'
+    and auth.role() = 'authenticated'
+    and exists (
+      select 1 from public.conversations c
+      where c.id = (storage.foldername(name))[1]
+        and auth.uid()::text = any(c.participants)
+    )
+  );
+
+drop policy if exists "Chat participants can read private images" on storage.objects;
+create policy "Chat participants can read private images"
+  on storage.objects for select
+  using (
+    bucket_id = 'mudmy-chats'
+    and auth.role() = 'authenticated'
+    and exists (
+      select 1 from public.conversations c
+      where c.id = (storage.foldername(name))[1]
+        and auth.uid()::text = any(c.participants)
+    )
+  );
+
 -- storage.objects policies for 'mudmy' bucket
 
 -- 1. Restricted public read policy for approved media folders only
@@ -585,6 +759,8 @@ as $$
   update pins set clicks = clicks + 1, updated_at = now() where id = pin_id;
 $$;
 
--- Grant execute to anon and authenticated roles
-grant execute on function increment_pin_views(text) to anon, authenticated;
-grant execute on function increment_pin_clicks(text) to anon, authenticated;
+-- Counters are updated only by record_pin_event, which applies deduplication.
+revoke all on function increment_pin_views(text) from public;
+revoke all on function increment_pin_clicks(text) from public;
+revoke all on function increment_pin_views(text) from anon, authenticated;
+revoke all on function increment_pin_clicks(text) from anon, authenticated;

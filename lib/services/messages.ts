@@ -19,6 +19,7 @@ function mapRowToConversation(row: any): Conversation {
 }
 
 const CHAT_IMAGE_RETENTION_MS = 10 * 24 * 60 * 60 * 1000
+const PRIVATE_CHAT_PREFIX = 'private-chat:'
 
 function mapRowToMessage(row: any): Message {
   const createdAt = row.created_at ? new Date(row.created_at).getTime() : 0
@@ -34,6 +35,17 @@ function mapRowToMessage(row: any): Message {
     image: isExpired ? null : (row.image || null),
     createdAt: row.created_at,
   }
+}
+
+async function mapRowsToMessages(rows: any[]): Promise<Message[]> {
+  return Promise.all((rows || []).map(async (row) => {
+    const message = mapRowToMessage(row)
+    if (!message.image?.startsWith(PRIVATE_CHAT_PREFIX) || message.image === null) return message
+
+    const path = message.image.slice(PRIVATE_CHAT_PREFIX.length)
+    const { data } = await supabase.storage.from('mudmy-chats').createSignedUrl(path, 60 * 60)
+    return { ...message, image: data?.signedUrl || undefined }
+  }))
 }
 
 /**
@@ -148,10 +160,10 @@ export async function sendMessage(
       const { compressImage } = await import('@/lib/utils')
       const compressedBlob = await compressImage(imageFile, 720, 0.55)
       const extension = 'jpg'
-      const fileName = `chats/${conversationId}/${Date.now()}.${extension}`
+      const fileName = `${conversationId}/${crypto.randomUUID()}.${extension}`
 
       const { error: uploadError } = await supabase.storage
-        .from('mudmy')
+        .from('mudmy-chats')
         .upload(fileName, compressedBlob)
 
       if (uploadError) {
@@ -159,8 +171,7 @@ export async function sendMessage(
         throw new Error('STORAGE_PERMISSION_DENIED')
       }
 
-      const { data: urlData } = supabase.storage.from('mudmy').getPublicUrl(fileName)
-      imageUrl = urlData?.publicUrl || ''
+      imageUrl = `${PRIVATE_CHAT_PREFIX}${fileName}`
     } catch (uploadErr: any) {
       console.warn('Upload to Storage failed:', uploadErr.message)
       throw uploadErr
@@ -303,7 +314,7 @@ export function subscribeToMessages(
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: true })
     .then(({ data }) => {
-      callback((data || []).map(mapRowToMessage))
+      mapRowsToMessages(data || []).then(callback)
     })
 
   const channel = supabase
@@ -324,7 +335,7 @@ export function subscribeToMessages(
           .eq('conversation_id', conversationId)
           .order('created_at', { ascending: true })
 
-        callback((data || []).map(mapRowToMessage))
+        mapRowsToMessages(data || []).then(callback)
       }
     )
     .subscribe((status) => {

@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { 
   ArrowLeft, Camera, Loader2, User, Phone, 
-  MessageCircle, Facebook, MapPin, Save, Bell,
+  MessageCircle, Facebook, MapPin, Save, Bell, Store,
   Volume2, VolumeX, Sparkles, HeartHandshake, Shield,
   Eye, EyeOff, Globe, Lock
 } from 'lucide-react'
@@ -36,6 +36,7 @@ export default function ProfileSettingsPage() {
   const [formData, setFormData] = useState({
     name: '',
     nickname: '',
+    businessName: '',
     phone: '',
     line: '',
     facebook: '',
@@ -77,6 +78,7 @@ export default function ProfileSettingsPage() {
           setFormData({
             name: profile.name || '',
             nickname: profile.nickname || profile.name || '',
+            businessName: profile.businessName || '',
             phone: profile.phone || '',
             line: profile.line || '',
             facebook: profile.facebook || '',
@@ -224,7 +226,23 @@ export default function ProfileSettingsPage() {
                     placeholder={t('profile.nicknamePlaceholder')}
                     required
                   />
+                  <p className="px-2 text-xs leading-5 text-muted-foreground">{t('profile.nicknameHint')}</p>
                 </div>
+                {user?.userType === 'business' && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium ml-2">{t('profile.businessName')} *</label>
+                    <div className="relative">
+                      <Input
+                        value={formData.businessName}
+                        onChange={e => setFormData(prev => ({ ...prev, businessName: e.target.value }))}
+                        className="h-12 rounded-2xl border-none bg-muted/30 pl-10 focus-visible:ring-primary/20"
+                        placeholder={t('profile.businessNamePlaceholder')}
+                        required
+                      />
+                      <Store className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
+                  </div>
+                )}
                 <div className="space-y-2">
                   <label className="text-sm font-medium ml-2">{t('profile.province')}</label>
                   <div className="relative">
@@ -238,12 +256,12 @@ export default function ProfileSettingsPage() {
                   </div>
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium ml-2">แนะนำตัว</label>
+                  <label className="text-sm font-medium ml-2">{t('profile.bio')}</label>
                   <textarea
                     value={formData.bio}
                     onChange={e => setFormData(prev => ({ ...prev, bio: e.target.value.slice(0, 300) }))}
                     className="min-h-28 w-full resize-y rounded-2xl bg-muted/30 px-4 py-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/20"
-                    placeholder="เล่าเกี่ยวกับตัวคุณ ธุรกิจ หรือสิ่งที่อยากให้ชุมชนรู้จัก"
+                    placeholder={t('profile.bioPlaceholder')}
                     maxLength={300}
                   />
                   <p className="text-right text-[11px] text-muted-foreground">{formData.bio.length}/300</p>
@@ -299,8 +317,8 @@ export default function ProfileSettingsPage() {
           {/* Theme Color Section */}
           <div className="space-y-5 rounded-3xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
             <div>
-              <h3 className="border-l-4 border-primary pl-3 text-xs font-black uppercase tracking-widest text-primary sm:text-sm">ธีมสีหลัก</h3>
-              <p className="text-xs text-muted-foreground">เลือกโทนสีพาสเทลที่ชอบ — มีผลทันทีทั่วทั้งแอป</p>
+              <h3 className="border-l-4 border-primary pl-3 text-xs font-black uppercase tracking-widest text-primary sm:text-sm">{t('profile.themeTitle')}</h3>
+              <p className="text-xs text-muted-foreground">{t('profile.themeSubtitle')}</p>
             </div>
 
             <div className="grid grid-cols-4 gap-2 sm:gap-3">
@@ -350,7 +368,7 @@ export default function ProfileSettingsPage() {
               />
               <div>
                 <p className="text-sm font-semibold">{activeTheme.label}</p>
-                <p className="text-xs text-muted-foreground">ธีมปัจจุบัน · มีผลทันทีไม่ต้องบันทึก</p>
+                <p className="text-xs text-muted-foreground">{t('profile.currentTheme')}</p>
               </div>
               <div className="ml-auto w-7 h-7 rounded-full" style={{ background: activeTheme.swatch, boxShadow: `0 0 0 3px ${activeTheme.swatch}55` }} />
             </div>
@@ -361,9 +379,9 @@ export default function ProfileSettingsPage() {
             <div>
               <h3 className="flex items-center gap-2 border-l-4 border-primary pl-3 text-xs font-black uppercase tracking-widest text-primary sm:text-sm">
                 <Bell className="w-4 h-4" />
-                การแจ้งเตือนเสียง
+                {t('profile.soundTitle')}
               </h3>
-              <p className="text-xs text-muted-foreground">ตั้งค่าเสียงแจ้งเตือนสำหรับการโต้ตอบในแอป</p>
+              <p className="text-xs text-muted-foreground">{t('profile.soundSubtitle')}</p>
             </div>
 
             <div className="space-y-4">
@@ -377,8 +395,8 @@ export default function ProfileSettingsPage() {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">เปิดใช้งานเสียงแจ้งเตือน</p>
-                    <p className="text-xs text-muted-foreground">รับเสียงแจ้งเตือนเมื่อมีการโต้ตอบ</p>
+                    <p className="text-sm font-medium text-foreground">{t('profile.soundEnabled')}</p>
+                    <p className="text-xs text-muted-foreground">{t('profile.soundEnabledHint')}</p>
                   </div>
                 </div>
                 <Switch
@@ -393,7 +411,7 @@ export default function ProfileSettingsPage() {
 
               {soundEnabled && (
                 <div className="space-y-3 pt-3 border-t border-border">
-                  <p className="text-xs font-medium text-muted-foreground">เลือกเสียงแจ้งเตือน</p>
+                  <p className="text-xs font-medium text-muted-foreground">{t('profile.chooseSound')}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {SOUND_OPTIONS.map((sound) => (
                       <button
@@ -425,7 +443,7 @@ export default function ProfileSettingsPage() {
                   {/* Volume Control */}
                   <div className="pt-3 border-t border-border">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs font-medium text-muted-foreground">ระดับเสียง</p>
+                      <p className="text-xs font-medium text-muted-foreground">{t('profile.volume')}</p>
                       <span className="text-xs font-bold text-primary">{Math.round(volume * 100)}%</span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -437,7 +455,7 @@ export default function ProfileSettingsPage() {
                           setSoundVolume(newVolume)
                         }}
                         className="w-8 h-8 rounded-lg bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
-                        title="ลดเสียง"
+                        title={t('profile.decreaseVolume')}
                       >
                         <VolumeX className="w-4 h-4 text-muted-foreground" />
                       </button>
@@ -466,7 +484,7 @@ export default function ProfileSettingsPage() {
                           setSoundVolume(newVolume)
                         }}
                         className="w-8 h-8 rounded-lg bg-muted hover:bg-muted/80 flex items-center justify-center transition-colors"
-                        title="เพิ่มเสียง"
+                        title={t('profile.increaseVolume')}
                       >
                         <Volume2 className="w-4 h-4 text-muted-foreground" />
                       </button>
@@ -507,9 +525,9 @@ export default function ProfileSettingsPage() {
             <div>
               <h3 className="flex items-center gap-2 border-l-4 border-primary pl-3 text-xs font-black uppercase tracking-widest text-primary sm:text-sm">
                 <Shield className="w-4 h-4" />
-                ความเป็นส่วนตัว
+                {t('profile.privacyTitle')}
               </h3>
-              <p className="text-xs text-muted-foreground">จัดการความเป็นส่วนตัวและการแสดงข้อมูลของคุณ</p>
+              <p className="text-xs text-muted-foreground">{t('profile.privacySubtitle')}</p>
             </div>
 
             <div className="space-y-4">
@@ -524,9 +542,9 @@ export default function ProfileSettingsPage() {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">การแสดงโปรไฟล์</p>
+                    <p className="text-sm font-medium text-foreground">{t('profile.profileVisibility')}</p>
                     <p className="text-xs text-muted-foreground">
-                      {profileVisibility === 'public' ? 'ทุกคนสามารถดูโปรไฟล์ของคุณ' : 'เฉพาะผู้ที่คุณอนุญาต'}
+                      {profileVisibility === 'public' ? t('profile.profilePublicHint') : t('profile.profilePrivateHint')}
                     </p>
                   </div>
                 </div>
@@ -540,7 +558,7 @@ export default function ProfileSettingsPage() {
                         : 'bg-muted hover:bg-muted/80 text-muted-foreground'
                     )}
                   >
-                    สาธารณะ
+                    {t('profile.public')}
                   </button>
                   <button
                     onClick={() => setProfileVisibility('private')}
@@ -551,14 +569,14 @@ export default function ProfileSettingsPage() {
                         : 'bg-muted hover:bg-muted/80 text-muted-foreground'
                     )}
                   >
-                    ส่วนตัว
+                    {t('profile.private')}
                   </button>
                 </div>
               </div>
 
               {/* Contact Info Visibility */}
               <div className="space-y-3 pt-3 border-t border-border">
-                <p className="text-xs font-medium text-muted-foreground">การแสดงข้อมูลติดต่อ</p>
+                <p className="text-xs font-medium text-muted-foreground">{t('profile.contactVisibility')}</p>
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -566,8 +584,8 @@ export default function ProfileSettingsPage() {
                       <Phone className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">แสดงเบอร์โทรศัพท์</p>
-                      <p className="text-xs text-muted-foreground">ผู้อื่นจะเห็นเบอร์โทรของคุณ</p>
+                      <p className="text-sm font-medium text-foreground">{t('profile.showPhone')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.showPhoneHint')}</p>
                     </div>
                   </div>
                   <Switch
@@ -583,8 +601,8 @@ export default function ProfileSettingsPage() {
                       <MessageCircle className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">แสดงอีเมล</p>
-                      <p className="text-xs text-muted-foreground">ผู้อื่นจะเห็นอีเมลของคุณ</p>
+                      <p className="text-sm font-medium text-foreground">{t('profile.showEmail')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.showEmailHint')}</p>
                     </div>
                   </div>
                   <Switch
@@ -600,8 +618,8 @@ export default function ProfileSettingsPage() {
                       <MapPin className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">แสดงที่อยู่/จังหวัด</p>
-                      <p className="text-xs text-muted-foreground">ผู้อื่นจะเห็นจังหวัดของคุณ</p>
+                      <p className="text-sm font-medium text-foreground">{t('profile.showLocation')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.showLocationHint')}</p>
                     </div>
                   </div>
                   <Switch
@@ -617,8 +635,8 @@ export default function ProfileSettingsPage() {
                       <MessageCircle className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">แสดง LINE</p>
-                      <p className="text-xs text-muted-foreground">เปิดเผย LINE ในโปรไฟล์สาธารณะ</p>
+                      <p className="text-sm font-medium text-foreground">{t('profile.showLine')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.showLineHint')}</p>
                     </div>
                   </div>
                   <Switch checked={showLine} onCheckedChange={setShowLine} className="data-[state=checked]:bg-blue-500" />
@@ -630,8 +648,8 @@ export default function ProfileSettingsPage() {
                       <Facebook className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">แสดง Facebook</p>
-                      <p className="text-xs text-muted-foreground">เปิดเผย Facebook ในโปรไฟล์สาธารณะ</p>
+                      <p className="text-sm font-medium text-foreground">{t('profile.showFacebook')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.showFacebookHint')}</p>
                     </div>
                   </div>
                   <Switch checked={showFacebook} onCheckedChange={setShowFacebook} className="data-[state=checked]:bg-blue-500" />
@@ -643,8 +661,8 @@ export default function ProfileSettingsPage() {
                       <MapPin className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">แสดงหมุดที่ปัก</p>
-                      <p className="text-xs text-muted-foreground">ผู้เข้าชมจะเห็นหมุดของคุณในโปรไฟล์</p>
+                      <p className="text-sm font-medium text-foreground">{t('profile.showPins')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.showPinsHint')}</p>
                     </div>
                   </div>
                   <Switch checked={showPins} onCheckedChange={setShowPins} className="data-[state=checked]:bg-blue-500" />
@@ -656,8 +674,8 @@ export default function ProfileSettingsPage() {
                       <HeartHandshake className="w-4 h-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">แสดงประวัติช่วยเหลือ</p>
-                      <p className="text-xs text-muted-foreground">ผู้เข้าชมจะเห็นผลงาน Hero ของคุณ</p>
+                      <p className="text-sm font-medium text-foreground">{t('profile.showHeroHistory')}</p>
+                      <p className="text-xs text-muted-foreground">{t('profile.showHeroHistoryHint')}</p>
                     </div>
                   </div>
                   <Switch checked={showHeroHistory} onCheckedChange={setShowHeroHistory} className="data-[state=checked]:bg-blue-500" />

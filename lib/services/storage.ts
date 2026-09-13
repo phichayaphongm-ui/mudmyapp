@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { compressImage } from '@/lib/utils';
 
-const BUCKET = 'mudmy';
+const BUCKET = 'mudmy-public';
 
 export async function uploadPinImage(file: File, userId: string, pinId: string): Promise<string> {
   try {
@@ -29,7 +29,7 @@ export async function uploadPinImage(file: File, userId: string, pinId: string):
 export async function deletePinImage(imageUrl: string): Promise<void> {
   try {
     // Extract path from Supabase public URL format:
-    // https://<project>.supabase.co/storage/v1/object/public/mudmy/<path>
+    // https://<project>.supabase.co/storage/v1/object/public/mudmy-public/<path>
     const marker = `/storage/v1/object/public/${BUCKET}/`;
     const idx = imageUrl.indexOf(marker);
     if (idx !== -1) {
