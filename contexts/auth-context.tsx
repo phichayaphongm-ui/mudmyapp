@@ -17,7 +17,6 @@ interface AuthContextType {
   signInWithEmail: (email: string, password: string) => Promise<void>;
   signUpWithEmail: (email: string, password: string, name: string, extraData?: Partial<AppUser>) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  signInWithFacebook: () => Promise<void>;
   signInWithLine: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -201,20 +200,6 @@ const buildRedirectTo = (fallbackPath: string) => {
     }
   };
 
-  const signInWithFacebook = async () => {
-    setError(null);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: {
-        redirectTo: buildRedirectTo('/auth/callback'),
-      },
-    });
-    if (error) {
-      setError(error);
-      throw error;
-    }
-  };
-
   // LINE login via Custom OIDC (requires 'line' provider configured in Supabase Auth > Providers > Add new provider > OIDC)
   const signInWithLine = async () => {
     setError(null);
@@ -286,7 +271,6 @@ const buildRedirectTo = (fallbackPath: string) => {
         signInWithEmail,
         signUpWithEmail,
         signInWithGoogle,
-        signInWithFacebook,
         signInWithLine,
         signOut,
         refreshProfile,
