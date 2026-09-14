@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Navbar } from '@/components/navbar'
 import { useAuth } from '@/contexts/auth-context'
 import { useLanguage } from '@/contexts/language-context'
+import { supabase } from '@/lib/supabase'
 import { createPin } from '@/lib/services/pins'
 import { createPayment } from '@/lib/services/payments'
 import { uploadPinImage } from '@/lib/services/storage'
@@ -303,9 +304,15 @@ function CreatePinContent() {
       });
 
       paymentStep = 'เริ่มการชำระเงินกับ Stripe'
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      const token = currentSession?.access_token;
+
       const paymentResponse = await fetch('/api/payments/charge', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({
           amount: 10,
           email: user.email,

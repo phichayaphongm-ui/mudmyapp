@@ -14,6 +14,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'missing userId' }, { status: 400 });
     }
 
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7).trim() : null;
+
     const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,7 +38,9 @@ export async function GET(req: Request) {
     const {
       data: { user },
       error: authError,
-    } = await supabase.auth.getUser();
+    } = bearerToken
+      ? await supabase.auth.getUser(bearerToken)
+      : await supabase.auth.getUser();
 
     if (authError || !user) {
       return NextResponse.json({ error: 'unauthorized' }, { status: 401 });

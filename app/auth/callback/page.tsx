@@ -33,8 +33,14 @@ function CallbackInner() {
       try {
         const hash = window.location.hash || '';
         const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
 
-        if (hash.includes('access_token') || params.has('code')) {
+        if (code) {
+          const { error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeErr && !cancelled) {
+            console.warn('Auth code exchange warning:', exchangeErr.message);
+          }
+        } else if (hash.includes('access_token')) {
           const { error: sessionError } = await supabase.auth.getSession();
           if (sessionError && !cancelled) {
             console.warn('Auth session parse warning:', sessionError.message);
@@ -42,10 +48,13 @@ function CallbackInner() {
         }
 
         const canonicalHost = getCanonicalHost();
+        const currentHost = window.location.host.replace(/^www\./i, '');
+        const targetHost = canonicalHost ? canonicalHost.replace(/^www\./i, '') : null;
+
         if (
-          canonicalHost &&
+          targetHost &&
           window.location.hostname !== 'localhost' &&
-          window.location.host !== canonicalHost
+          currentHost !== targetHost
         ) {
           if (!cancelled) {
             setMessage('กำลังส่งต่อไปยัง URL หลักของแอปพลิเคชัน...');

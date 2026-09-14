@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 import { checkRateLimit, getRequestIdentity } from '@/lib/server/rate-limit';
 
 export async function POST(request: Request) {
@@ -22,6 +23,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing payment details' }, { status: 400 });
     }
 
+    const authHeader = request.headers.get('Authorization') || request.headers.get('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7).trim() : null;
+
     const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -33,19 +37,35 @@ export async function POST(request: Request) {
         },
       },
     );
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user || user.id !== userId) {
+
+    let user: any = null;
+    let authError: any = null;
+
+    if (bearerToken) {
+      const authRes = await supabase.auth.getUser(bearerToken);
+      user = authRes.data.user;
+      authError = authRes.error;
+    } else {
+      const authRes = await supabase.auth.getUser();
+      user = authRes.data.user;
+      authError = authRes.error;
+    }
+
+    if (authError || !user || user.id !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: payment, error: paymentError } = await supabase
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data: payment, error: paymentError } = await supabaseAdmin
       .from('payments')
       .select('id, user_id, pin_id, amount, status')
       .eq('id', paymentId)
       .eq('user_id', user.id)
       .eq('pin_id', pinId)
       .maybeSingle();
+
     if (paymentError || !payment) {
+      console.error('Payment query error or not found:', paymentError, 'paymentId:', paymentId);
       return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
     }
     if (payment.status === 'paid') {
@@ -75,7 +95,7 @@ export async function POST(request: Request) {
         quantity: 1,
       }],
       metadata: { paymentId, userId, pinId },
-      success_url: `${origin}/dashboard?payment=success`,
+      success_url: `${origin}/dashboard?payment=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/create-pin?payment=cancelled`,
     });
 

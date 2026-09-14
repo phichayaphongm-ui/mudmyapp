@@ -14,6 +14,9 @@ export async function POST(req: NextRequest) {
     if (contentLength > 256 * 1024) {
       return NextResponse.json({ error: 'Request body is too large' }, { status: 413 });
     }
+    const authHeader = req.headers.get('Authorization') || req.headers.get('authorization');
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7).trim() : null;
+
     const cookieStore = await cookies();
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,8 +28,10 @@ export async function POST(req: NextRequest) {
         },
       },
     );
-    const { data: { user: authUser } } = await supabase.auth.getUser();
-    if (!authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { data: { user: authUser }, error: authError } = bearerToken
+      ? await supabase.auth.getUser(bearerToken)
+      : await supabase.auth.getUser();
+    if (authError || !authUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
 

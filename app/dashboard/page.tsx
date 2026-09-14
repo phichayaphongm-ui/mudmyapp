@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import {
   MapPin, Plus, Settings, CreditCard, BarChart3, Eye, Clock,
@@ -17,7 +17,8 @@ import { Switch } from '@/components/ui/switch'
 import { Navbar } from '@/components/navbar'
 import { useAuth } from '@/contexts/auth-context'
 import { useLanguage } from '@/contexts/language-context'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 import { getUserPins, checkInFreePin, renewPaidPin, deletePin } from '@/lib/services/pins'
 import { getUserPayments } from '@/lib/services/payments'
 import type { Pin, Payment } from '@/lib/types'
@@ -37,8 +38,12 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 const MAX_PINS = 5
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const sessionId = searchParams.get('session_id')
+  const paymentQuery = searchParams.get('payment')
+
   const { user, loading: authLoading } = useAuth()
   const { t } = useLanguage()
   const [activeTab, setActiveTab] = useState('pins')
@@ -67,11 +72,62 @@ export default function DashboardPage() {
     }
   }, [user, authLoading, router])
 
+  const handleVerifyPayment = async (targetSessionId?: string, targetPinId?: string) => {
+    if (targetPinId) setLoadingPinId(targetPinId)
+    try {
+      const { data: { session: authSession } } = await supabase.auth.getSession()
+      const token = authSession?.access_token
+      const query = targetSessionId 
+        ? `session_id=${encodeURIComponent(targetSessionId)}` 
+        : `pin_id=${encodeURIComponent(targetPinId || '')}`
+      
+      const res = await fetch(`/api/payments/verify-session?${query}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      const data = await res.json()
+      if (data?.ok) {
+        toast.success('ชำระเงินสำเร็จแล้ว! หมุดของคุณพร้อมใช้งานบนแผนที่เรียบร้อย')
+        if (user) {
+          const fetchedPins = await getUserPins(user.id)
+          setPins(fetchedPins)
+        }
+      } else if (data?.message) {
+        toast.info(data.message)
+      }
+    } catch (e) {
+      console.error(e)
+      toast.error('ไม่สามารถตรวจสอบการชำระเงินได้')
+    } finally {
+      setLoadingPinId(null)
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
         setLoadingData(true)
         try {
+          if (sessionId || paymentQuery === 'success') {
+            try {
+              const { data: { session: authSession } } = await supabase.auth.getSession()
+              const token = authSession?.access_token
+              const query = sessionId 
+                ? `session_id=${encodeURIComponent(sessionId)}`
+                : ''
+              if (query) {
+                const res = await fetch(`/api/payments/verify-session?${query}`, {
+                  headers: token ? { Authorization: `Bearer ${token}` } : {},
+                })
+                const verifyData = await res.json()
+                if (verifyData?.ok) {
+                  toast.success('ชำระเงินสำเร็จแล้ว! หมุดเปิดใช้งานเรียบร้อยแล้ว')
+                }
+              }
+            } catch (err) {
+              console.error('Auto verify session error:', err)
+            }
+          }
+
           const [fetchedPins, fetchedPayments] = await Promise.all([
             getUserPins(user.id),
             getUserPayments(user.id)
@@ -92,7 +148,7 @@ export default function DashboardPage() {
       }
     }
     fetchData()
-  }, [user])
+  }, [user, sessionId, paymentQuery])
 
   if (authLoading || (user && loadingData)) {
     return (
@@ -111,6 +167,7 @@ export default function DashboardPage() {
   if (!user) return null
 
   const activePins = pins.filter((p) => p.status === 'active')
+  const pendingPins = pins.filter((p) => p.status === 'pending_payment')
   const historyPins = pins.filter((p) => p.status === 'expired' || p.status === 'resolved')
   
   const handleCheckIn = async (pinId: string) => {
@@ -262,6 +319,35 @@ export default function DashboardPage() {
                 เหลือ {MAX_PINS - activePins.length} หมุดที่สามารถปักได้
               </p>
             </div>
+
+            {/* Pending Pins Alert / List */}
+            {pendingPins.length > 0 && (
+              <div className="space-y-3 mb-6 bg-amber-50/80 border-2 border-amber-200 rounded-3xl p-5 shadow-sm">
+                <h2 className="text-sm font-bold text-amber-700 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-amber-500 animate-pulse" />
+                  หมุดที่รอการยืนยันชำระเงิน ({pendingPins.length})
+                </h2>
+                <div className="space-y-2">
+                  {pendingPins.map((pin) => (
+                    <div key={pin.id} className="bg-white border border-amber-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                      <div>
+                        <h3 className="font-bold text-foreground text-sm">{pin.title}</h3>
+                        <p className="text-xs text-muted-foreground">หากคุณชำระเงินผ่าน Stripe แล้ว สามารถกดปุ่มตรวจสอบเพื่อเปิดใช้งานหมุดได้ทันที</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs gap-1.5 shadow-sm"
+                        onClick={() => handleVerifyPayment(undefined, pin.id)}
+                        disabled={loadingPinId === pin.id}
+                      >
+                        {loadingPinId === pin.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                        ตรวจสอบชำระเงิน
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Active Pins */}
             <div>
@@ -728,6 +814,18 @@ export default function DashboardPage() {
 
       <MobileBottomNav />
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   )
 }
 

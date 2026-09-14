@@ -33,7 +33,7 @@ export default function RegisterPage() {
   const [userType, setUserType] = useState<'personal' | 'business' | null>(null)
   const [businessName, setBusinessName] = useState('')
   const router = useRouter()
-  const { user, loading: authLoading, signUpWithEmail, signInWithGoogle, signInWithLine } = useAuth()
+  const { user, loading: authLoading, signUpWithEmail, signInWithGoogle } = useAuth()
   const { t } = useLanguage()
 
   useEffect(() => {
@@ -69,16 +69,6 @@ export default function RegisterPage() {
     } catch (error) {
       console.error('Google registration error:', error)
       setError(t('login.error'))
-    }
-  }
-
-  const handleLineRegister = async () => {
-    try {
-      await signInWithLine()
-      router.push('/dashboard')
-    } catch (error) {
-      console.error('Line registration error:', error)
-      setError('การสมัครสมาชิกด้วย LINE ยังไม่ได้เปิดใช้งานในระบบ')
     }
   }
 
@@ -236,10 +226,9 @@ export default function RegisterPage() {
           {/* Social Logins for Register - Glassmorphism for mobile */}
           {!userType && (
             <div className="space-y-8 px-1 animate-slide-up" style={{ animationDelay: '100ms' }}>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 {[
-                  { id: 'google', icon: <GoogleIcon />, onClick: handleGoogleRegister, hover: 'active:bg-red-50 active:border-red-200' },
-                  { id: 'line', icon: <LineIcon />, onClick: handleLineRegister, hover: 'active:bg-green-50 active:border-green-200' }
+                  { id: 'google', icon: <GoogleIcon />, onClick: handleGoogleRegister, hover: 'active:bg-red-50 active:border-red-200' }
                 ].map((social) => (
                   <motion.button
                     key={social.id}
@@ -518,10 +507,3 @@ function GoogleIcon() {
   )
 }
 
-function LineIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="#00C300">
-      <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 3.514 8.888 8.441 9.605.663.14 1.564.428 1.803 1.05.216.564.14 1.45.068 2.029-.089.7-.428 2.58-1 3.29-.445.553-.356.666-.356.666s.09.02.268.046c1.65.234 5.972-2.316 8.57-4.633 3.903-3.064 6.206-6.425 6.206-12.053z"/>
-    </svg>
-  )
-}

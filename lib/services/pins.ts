@@ -346,10 +346,14 @@ export async function updatePin(pinId: string, updateData: Partial<Pin>): Promis
   }
 }
 
-export async function incrementPinViews(pinId: string): Promise<void> {
+export async function incrementPinViews(pinId: string, visitorKey?: string): Promise<void> {
   try {
-    // ✔️ Atomic increment via RPC — no race condition
-    const { error } = await supabase.rpc('increment_pin_views', { pin_id: pinId });
+    // Use record_pin_event which handles dedup and has correct permissions
+    const { error } = await supabase.rpc('record_pin_event', {
+      p_pin_id: pinId,
+      p_type: 'view',
+      p_visitor_key: visitorKey ?? null,
+    });
     if (error) throw error;
   } catch (error) {
     console.error('Error incrementing pin views:', error);
@@ -357,10 +361,14 @@ export async function incrementPinViews(pinId: string): Promise<void> {
   }
 }
 
-export async function incrementPinClicks(pinId: string): Promise<void> {
+export async function incrementPinClicks(pinId: string, visitorKey?: string): Promise<void> {
   try {
-    // ✔️ Atomic increment via RPC — no race condition
-    const { error } = await supabase.rpc('increment_pin_clicks', { pin_id: pinId });
+    // Use record_pin_event which handles dedup and has correct permissions
+    const { error } = await supabase.rpc('record_pin_event', {
+      p_pin_id: pinId,
+      p_type: 'click',
+      p_visitor_key: visitorKey ?? null,
+    });
     if (error) throw error;
   } catch (error) {
     console.error('Error incrementing pin clicks:', error);
